@@ -287,7 +287,7 @@ export default function Home() {
                           controls
                           playsInline
                           muted
-                          preload="metadata"
+                          preload="none"
                           className="h-full w-full object-cover"
                         />
                       ) : (
