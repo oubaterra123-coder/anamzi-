@@ -84,7 +84,7 @@ export default function Home() {
           color: "from-neutral-700 to-neutral-950",
           emoji: "🛍️",
           description: item.description ?? "",
-          video_url: item.video_url ?? "",
+          video_url: item.video_url ? (item.video_url.startsWith("http") ? item.video_url : supabase.storage.from("products").getPublicUrl(item.video_url).data.publicUrl) : "",
           whatsapp_number: item.whatsapp_number ?? "",
         })));
       }
