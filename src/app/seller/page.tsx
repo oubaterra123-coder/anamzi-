@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
@@ -59,8 +59,8 @@ export default function SellerPage() {
       return;
     }
 
-    if (video.size > 100 * 1024 * 1024) {
-      setMessage("The video must be smaller than 100 MB.");
+    if (video.size > 50 * 1024 * 1024) {
+      setMessage("The video must be 50 MB or smaller.");
       return;
     }
 
@@ -319,7 +319,7 @@ export default function SellerPage() {
               className="block w-full rounded-xl border border-white/10 bg-black p-3 text-sm file:mr-4 file:rounded-lg file:border-0 file:bg-[#b7ff35] file:px-4 file:py-2 file:font-bold file:text-black"
             />
             <p className="mt-2 text-xs text-neutral-500">
-              Maximum file size: 100 MB.
+              Maximum file size: 50 MB.
             </p>
           </div>
 
@@ -369,11 +369,3 @@ export default function SellerPage() {
     </main>
   );
 }
-
-
-
-
-
-
-
-
