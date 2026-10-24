@@ -161,7 +161,7 @@ export default function Home() {
           <div className="hidden items-center gap-7 text-sm font-medium md:flex">
             <a href="#discover" className="hover:text-[#b7ff35]">Discover</a>
             <a href="#products" className="hover:text-[#b7ff35]">Products</a>
-            <a href="#sell" className="hover:text-[#b7ff35]">Become a seller</a>
+            <a href="/seller" className="hover:text-[#b7ff35]">Become a seller</a>
           </div>
           <div className="flex items-center gap-2">
             <a href="#discover" className="rounded-full border border-white/10 px-4 py-2 text-sm font-semibold hover:bg-[#111513]">Explore</a>
@@ -196,7 +196,7 @@ export default function Home() {
           </p>
           <div className="mt-8 flex flex-wrap gap-3">
             <a href="#products" className="rounded-full bg-[#b7ff35] px-6 py-3.5 font-bold text-[#080a09] transition hover:bg-[#9de51f]">Explore products ↗</a>
-            <a href="#sell" className="rounded-full border border-white/10 bg-[#111513] px-6 py-3.5 font-bold hover:border-[#b7ff35]/70">Start selling</a>
+            <a href="/seller" className="rounded-full border border-white/10 bg-[#111513] px-6 py-3.5 font-bold hover:border-[#b7ff35]/70">Start selling</a>
           </div>
           <div className="mt-10 flex gap-8 border-t border-white/10 pt-6">
             <div><p className="text-2xl font-black">Video</p><p className="mt-1 text-xs text-neutral-400">Product discovery</p></div>
@@ -475,7 +475,7 @@ export default function Home() {
             <h2 className="mt-3 max-w-xl text-4xl font-black tracking-tight sm:text-4xl">Turn your content into commerce.</h2>
             <p className="mt-3 max-w-lg leading-7 text-[#c3c9c5]">Join a new way to showcase products, reach customers and grow your business.</p>
           </div>
-          <button onClick={() => alert("Seller registration will be available in a future stage.")} className="shrink-0 rounded-full bg-[#b7ff35] px-6 py-3.5 font-bold text-black transition hover:bg-[#9de51f]">Become a seller ↗</button>
+          <a href="/seller" className="shrink-0 rounded-full bg-[#b7ff35] px-6 py-3.5 font-bold text-black transition hover:bg-[#9de51f]">Become a seller ↗</a>
         </div>
       </section>
 
