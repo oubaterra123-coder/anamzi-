@@ -30,29 +30,23 @@ export default function LoginPage() {
     setLoading(true);
 
     try {
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email: email.trim(),
-        password,
-      });
-
-      if (error || !data.session) {
-        setMessage("Invalid email or password.");
-        return;
-      }
-
       const response = await fetch("/api/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: email.trim(), password }),
+        body: JSON.stringify({
+          email: email.trim(),
+          password,
+        }),
       });
 
       const result = await response.json();
 
       if (!response.ok) {
-        await supabase.auth.signOut();
-        setMessage(result.error || "Unable to sign in.");
+        setMessage(result.error || "Invalid email or password.");
         return;
       }
+
+
 
       router.replace("/");
       router.refresh();
@@ -66,7 +60,7 @@ export default function LoginPage() {
   return (
     <main className="flex min-h-screen items-center justify-center bg-[#050706] px-5 py-12 text-[#e5e7eb]">
       <form onSubmit={handleLogin} className="w-full max-w-md space-y-5 rounded-3xl border border-white/10 bg-[#0b0f0c] p-8">
-        <Link href="/" className="text-sm text-[#b7ff35]">â† ANAMZI</Link>
+        <Link href="/" className="text-sm text-[#b7ff35]">Ã¢â€ Â ANAMZI</Link>
         <h1 className="text-3xl font-bold">Welcome back</h1>
         <p className="text-sm text-gray-400">Sign in to continue to ANAMZI.</p>
 
@@ -86,4 +80,6 @@ export default function LoginPage() {
     </main>
   );
 }
+
+
 

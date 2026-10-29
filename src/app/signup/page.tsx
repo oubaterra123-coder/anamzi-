@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState } from "react";
 import Link from "next/link";
@@ -42,7 +42,7 @@ export default function SignupPage() {
         });
 
       if (profileError) {
-        setMessage("Account created, but profile setup failed. Please sign in.");
+        setMessage("Profile setup failed: " + profileError.message);
         return;
       }
 
@@ -56,7 +56,7 @@ export default function SignupPage() {
   return (
     <main className="flex min-h-screen items-center justify-center bg-[#050706] px-5 py-12 text-[#e5e7eb]">
       <form onSubmit={handleSignup} className="w-full max-w-md space-y-5 rounded-3xl border border-white/10 bg-[#0b0f0c] p-8">
-        <Link href="/" className="text-sm text-[#b7ff35]">← ANAMZI</Link>
+        <Link href="/" className="text-sm text-[#b7ff35]">â† ANAMZI</Link>
         <h1 className="text-3xl font-bold">Create your account</h1>
         <p className="text-sm text-gray-400">Join ANAMZI and discover products.</p>
 
@@ -77,3 +77,4 @@ export default function SignupPage() {
     </main>
   );
 }
+
