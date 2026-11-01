@@ -5,8 +5,10 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 import * as tus from "tus-js-client";
+import { useLanguage } from "@/components/language-provider";
 
 export default function SellerPage() {
+  const { t } = useLanguage();
   const router = useRouter();
   const [checking, setChecking] = useState(true);
   const [userId, setUserId] = useState("");
@@ -52,36 +54,36 @@ export default function SellerPage() {
     setMessage("");
 
     if (!userId) {
-      setMessage("Please sign in before submitting a product.");
+      setMessage(t("signInBeforeProduct"));
       return;
     }
 
     const selectedMedia = mediaType === "video" ? video : image;
 
     if (!selectedMedia) {
-      setMessage(mediaType === "video" ? "Please choose a product video." : "Please choose a product image.");
+      setMessage(mediaType === "video" ? t("chooseVideo") : t("chooseImage"));
       return;
     }
 
     if (mediaType === "video" && !selectedMedia.type.startsWith("video/")) {
-      setMessage("Please select a valid video file.");
+      setMessage(t("validVideo"));
       return;
     }
 
     if (mediaType === "image" && !selectedMedia.type.startsWith("image/")) {
-      setMessage("Please select a valid image file.");
+      setMessage(t("validImage"));
       return;
     }
 
     if (selectedMedia.size > 50 * 1024 * 1024) {
-      setMessage("The file must be 50 MB or smaller.");
+      setMessage(t("maxFileSize"));
       return;
     }
 
     const numericPrice = Number(price);
 
     if (!Number.isFinite(numericPrice) || numericPrice <= 0) {
-      setMessage("Enter a valid price.");
+      setMessage(t("validPrice"));
       return;
     }
 
@@ -92,21 +94,21 @@ export default function SellerPage() {
           throw new Error("Invalid protocol");
         }
       } catch {
-        setMessage("Enter a valid affiliate URL starting with https://");
+        setMessage(t("validAffiliateUrl"));
         return;
       }
     }
 
     setLoading(true);
     setUploadProgress(0);
-    setMessage("Preparing your product...");
+    setMessage(t("preparingProduct"));
     console.log("[ANAMZI] Submission started");
 
     let uploadedPath = "";
 
     try {
       console.log("[ANAMZI] Saving profile");
-      setMessage("Step 1/3: Saving your profile...");
+      setMessage(t("savingProfile"));
       const { data: profile, error: profileError } = await supabase
         .from("profiles")
         .upsert({
@@ -117,7 +119,7 @@ export default function SellerPage() {
         .single();
 
       if (profileError || !profile) {
-        setMessage(`Profile error: ${profileError?.message ?? "No profile row returned."}`);
+        setMessage(`${t("profileError")}${profileError?.message ?? "No profile row returned."}`);
         return;
       }
 
@@ -125,7 +127,7 @@ export default function SellerPage() {
       uploadedPath = `${userId}/${crypto.randomUUID()}.${extension}`;
 
       console.log("[ANAMZI] Uploading " + mediaType, selectedMedia.size);
-      setMessage("Step 2/3: Uploading your " + mediaType + "...");
+      setMessage(t("uploading") + " " + (mediaType === "video" ? t("video") : t("image")) + "...");
 
       try {
         const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
@@ -161,7 +163,7 @@ export default function SellerPage() {
             onProgress(bytesUploaded, bytesTotal) {
               const percent = bytesTotal > 0 ? Math.round(bytesUploaded * 100 / bytesTotal) : 0;
               setUploadProgress(percent);
-              setMessage("Uploading " + mediaType + "... " + percent + "%");
+              setMessage(t("uploading") + " " + (mediaType === "video" ? t("video") : t("image")) + "... " + percent + "%");
             },
             onSuccess() {
               setUploadProgress(100);
@@ -177,7 +179,7 @@ export default function SellerPage() {
         return;
       }
       console.log("[ANAMZI] Saving product");
-      setMessage("Step 3/3: Saving your product...");
+      setMessage(t("savingProduct"));
       const { error: productError } = await supabase
         .from("products")
         .insert({
@@ -202,7 +204,7 @@ export default function SellerPage() {
         return;
       }
 
-      setMessage("Product submitted successfully! It is waiting for review.");
+      setMessage(t("submittedSuccess"));
       setTitle("");
       setDescription("");
       setPrice("");
@@ -223,7 +225,7 @@ export default function SellerPage() {
       if (uploadedPath) {
         await supabase.storage.from("products").remove([uploadedPath]);
       }
-      setMessage("Something went wrong. Please try again.");
+      setMessage(t("somethingWrong"));
     } finally {
       setLoading(false);
     }
@@ -232,7 +234,7 @@ export default function SellerPage() {
   if (checking) {
     return (
       <main className="flex min-h-screen items-center justify-center bg-[#050706] text-[#b7ff35]">
-        Checking your account...
+        {t("checking")}
       </main>
     );
   }
@@ -271,7 +273,7 @@ export default function SellerPage() {
               maxLength={120}
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              placeholder="e.g. Everyday sneakers"
+              placeholder={t("productTitle")}
               className="w-full rounded-xl border border-white/10 bg-black px-4 py-3 outline-none focus:border-[#b7ff35]"
             />
           </div>
@@ -287,7 +289,7 @@ export default function SellerPage() {
               rows={4}
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              placeholder="Describe your product..."
+              placeholder={t("description")}
               className="w-full resize-y rounded-xl border border-white/10 bg-black px-4 py-3 outline-none focus:border-[#b7ff35]"
             />
           </div>
@@ -329,7 +331,7 @@ export default function SellerPage() {
           </div>
 
           <div>
-            <span className="mb-2 block text-sm font-semibold">Available colors (optional)</span>
+            <span className="mb-2 block text-sm font-semibold">{t("colors")}</span>
             <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
               {[
                 { name: "Black", color: "#171717" },
@@ -393,7 +395,7 @@ export default function SellerPage() {
           </div>
 
           <div>
-            <span className="mb-2 block text-sm font-semibold">Available clothing sizes (optional)</span>
+            <span className="mb-2 block text-sm font-semibold">{t("clothingSizes")}</span>
             <div className="flex flex-wrap gap-2">
               {["S", "M", "L", "XL", "XXL"].map((option) => (
                 <label key={option} className="flex cursor-pointer items-center gap-2 rounded-full border border-white/10 px-3 py-2 text-sm">
@@ -405,7 +407,7 @@ export default function SellerPage() {
           </div>
 
           <div>
-            <span className="mb-2 block text-sm font-semibold">Available shoe sizes EU (optional)</span>
+            <span className="mb-2 block text-sm font-semibold">{t("shoeSizes")}</span>
             <div className="flex flex-wrap gap-2">
               {Array.from({ length: 23 }, (_, i) => String(i + 20)).map((option) => (
                 <label key={option} className="flex cursor-pointer items-center gap-2 rounded-full border border-white/10 px-3 py-2 text-sm">
@@ -417,14 +419,14 @@ export default function SellerPage() {
           </div>
 
           <div>
-            <span className="mb-2 block text-sm font-semibold">Product type</span>
+            <span className="mb-2 block text-sm font-semibold">{t("productType")}</span>
             <select
               value={productType}
               onChange={(e) => setProductType(e.target.value as "direct" | "affiliate")}
               className="w-full rounded-xl border border-white/10 bg-black px-4 py-3 outline-none focus:border-[#b7ff35]"
             >
-              <option value="direct">Direct seller â€” WhatsApp orders</option>
-              <option value="affiliate">Affiliate â€” external purchase link</option>
+              <option value="direct">{t("directSeller")}</option>
+              <option value="affiliate">{t("affiliate")}</option>
             </select>
             <p className="mt-2 text-xs text-neutral-500">
               Direct products send customers to your WhatsApp. Affiliate products send customers to your affiliate link.
@@ -485,8 +487,8 @@ export default function SellerPage() {
               }}
               className="w-full rounded-xl border border-white/10 bg-black px-4 py-3 outline-none focus:border-[#b7ff35]"
             >
-              <option value="video">Video</option>
-              <option value="image">Image</option>
+              <option value="video">{t("video")}</option>
+              <option value="image">{t("image")}</option>
             </select>
           </div>
 
@@ -523,7 +525,7 @@ export default function SellerPage() {
                 onChange={(e) => setVideo(e.target.files?.[0] ?? null)}
                 className="block w-full rounded-xl border border-white/10 bg-black p-3 text-sm file:mr-4 file:rounded-lg file:border-0 file:bg-[#b7ff35] file:px-4 file:py-2 file:font-bold file:text-black"
               />
-              <p className="mt-2 text-xs text-neutral-500">Maximum file size: 50 MB.</p>
+              <p className="mt-2 text-xs text-neutral-500">{t("maxFileSize")}</p>
             </div>
           ) : (
             <div>
@@ -538,7 +540,7 @@ export default function SellerPage() {
                 onChange={(e) => setImage(e.target.files?.[0] ?? null)}
                 className="block w-full rounded-xl border border-white/10 bg-black p-3 text-sm file:mr-4 file:rounded-lg file:border-0 file:bg-[#b7ff35] file:px-4 file:py-2 file:font-bold file:text-black"
               />
-              <p className="mt-2 text-xs text-neutral-500">Maximum file size: 50 MB.</p>
+              <p className="mt-2 text-xs text-neutral-500">{t("maxFileSize")}</p>
             </div>
           )}
 
@@ -555,20 +557,20 @@ export default function SellerPage() {
           {loading && message.startsWith("Uploading video") && (
             <div className="space-y-2 rounded-xl border border-white/10 bg-black p-4">
               <div className="flex items-center justify-between text-sm">
-                <span className="text-neutral-300">Video upload progress</span>
+                <span className="text-neutral-300">{t("videoProgress")}</span>
                 <span className="font-bold text-[#b7ff35]">{uploadProgress}%</span>
               </div>
               <div
                 className="h-2 w-full overflow-hidden rounded-full bg-white/10"
                 role="progressbar"
-                aria-label="Video upload progress"
+                aria-label={t("videoProgress")}
                 aria-valuemin={0}
                 aria-valuemax={100}
                 aria-valuenow={uploadProgress}
               >
                 <div className="h-full rounded-full bg-[#b7ff35] transition-[width] duration-200" style={{ width: uploadProgress + "%" }} />
               </div>
-              <p className="text-xs text-neutral-500">Keep this page open until the upload finishes.</p>
+              <p className="text-xs text-neutral-500">{t("keepOpen")}</p>
             </div>
           )}
 
@@ -577,7 +579,7 @@ export default function SellerPage() {
             disabled={loading}
             className="w-full rounded-xl bg-[#b7ff35] px-5 py-4 font-black text-black transition hover:bg-[#caff70] disabled:cursor-not-allowed disabled:opacity-50"
           >
-            {loading ? "Submitting..." : "Submit product for review"}
+            {loading ? t("submitting") : t("submitForReview")}
           </button>
 
           <p className="text-center text-xs leading-5 text-neutral-500">
@@ -588,4 +590,7 @@ export default function SellerPage() {
     </main>
   );
 }
+
+
+
 
