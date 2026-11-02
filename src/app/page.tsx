@@ -703,20 +703,20 @@ export default function Home() {
                     onChange={(e) => setBuyerCountry(e.target.value)}
                     className="w-full rounded-xl border border-white/10 bg-[#050706] px-4 py-3 outline-none focus:border-[#b7ff35]"
                   >
-                    <option value="MA">{"Morocco \u2014 ???????"}</option>
-                    <option value="FR">{"France \u2014 Fran?ais"}</option>
+                    <option value="MA">{"Morocco \u2014 \u0627\u0644\u0639\u0631\u0628\u064a\u0629"}</option>
+                    <option value="FR">{"France \u2014 Fran\u00E7ais"}</option>
                     <option value="GB">{"United Kingdom \u2014 English"}</option>
                     <option value="US">{"United States \u2014 English"}</option>
-                    <option value="ES">{"Spain \u2014 Espa?ol"}</option>
-                    <option value="SA">{"Saudi Arabia \u2014 ???????"}</option>
+                    <option value="ES">{"Spain \u2014 Espa\u00F1ol"}</option>
+                    <option value="SA">{"Saudi Arabia \u2014 \u0627\u0644\u0639\u0631\u0628\u064a\u0629"}</option>
                     <option value="DE">{"Germany \u2014 Deutsch"}</option>
                     <option value="IT">{"Italy \u2014 Italiano"}</option>
-                    <option value="PT">{"Portugal \u2014 Portugu?s"}</option>
+                    <option value="PT">{"Portugal \u2014 Portugu\u00EAs"}</option>
                     <option value="NL">{"Netherlands \u2014 Nederlands"}</option>
-                    <option value="TR">{"Turkey \u2014 T?rk?e"}</option>
-                    <option value="RU">{"Russia \u2014 ???????"}</option>
-                    <option value="CN">{"China \u2014 ??"}</option>
-                    <option value="JP">{"Japan \u2014 ???"}</option>
+                    <option value="TR">{"Turkey \u2014 T\u00FCrk\u00E7e"}</option>
+                    <option value="RU">{"Russia \u2014 \u0420\u0443\u0441\u0441\u043A\u0438\u0439"}</option>
+                    <option value="CN">{"China \u2014 \u4E2D\u6587"}</option>
+                    <option value="JP">{"Japan \u2014 \u65E5\u672C\u8A9E"}</option>
                     <option value="IN">{"India \u2014 English"}</option>
                     <option value="OTHER">{"Other country \u2014 English"}</option>
 </select>
