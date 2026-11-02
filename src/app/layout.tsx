@@ -14,6 +14,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
+  verification: { google: "Uh-ViFaleu6LZHbkmAptB-lz6VbsI8NbLR9Ef47fQSE" },
   title: "ANAMZI — Discover. Watch. Shop.",
   description: "Discover products, watch videos and shop directly with sellers on ANAMZI.",
   icons: { icon: "/logo.png", shortcut: "/logo.png", apple: "/logo.png" },
