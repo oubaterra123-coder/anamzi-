@@ -1,4 +1,4 @@
-﻿
+
 "use client";
 
 
@@ -98,7 +98,7 @@ export default function Home() {
           category: item.category ?? "Other",
           price: `${Number(item.price).toFixed(2)} ${item.currency ?? ""}`.trim(),
           color: "from-neutral-700 to-neutral-950",
-          emoji: "Ã°Å¸â€ºÂÃ¯Â¸Â",
+          emoji: "\uD83D\uDCE6",
           description: item.description ?? "",
           video_url: item.video_url ? (item.video_url.startsWith("http") ? item.video_url : supabase.storage.from("products").getPublicUrl(item.video_url).data.publicUrl) : "",
           image_url: item.image_url ? (item.image_url.startsWith("http") ? item.image_url : supabase.storage.from("products").getPublicUrl(item.image_url).data.publicUrl) : "",
@@ -169,14 +169,13 @@ export default function Home() {
         intro: "Bonjour ! Je souhaite commander ce produit sur ANAMZI :",
         product: "Produit",
         price: "Prix",
-        quantity: "QuantitÃƒÂ©",
+        quantity: "Quantit\u00E9",
         name: "Nom",
-        phone: "TÃƒÂ©lÃƒÂ©phone",
+        phone: "T\u00E9l\u00E9phone",
         city: "Ville",
         address: "Adresse",
-        ending: "Merci de confirmer la disponibilitÃƒÂ© et les modalitÃƒÂ©s de livraison."
-      },
-      GB: {
+        ending: "Merci de confirmer la disponibilit\u00E9 et les modalit\u00E9s de livraison."
+      },      GB: {
         intro: "Hello! I'd like to order this product from ANAMZI:",
         product: "Product",
         price: "Price",
@@ -199,17 +198,16 @@ export default function Home() {
         ending: "Please confirm availability and shipping details."
       },
       ES: {
-        intro: "Ã‚Â¡Hola! Quiero pedir este producto de ANAMZI:",
+        intro: "\u00A1Hola! Quiero pedir este producto de ANAMZI:",
         product: "Producto",
         price: "Precio",
         quantity: "Cantidad",
         name: "Nombre",
-        phone: "TelÃƒÂ©fono",
+        phone: "Tel\u00E9fono",
         city: "Ciudad",
-        address: "DirecciÃƒÂ³n",
+        address: "Direcci\u00F3n",
         ending: "Por favor, confirma la disponibilidad y los detalles de entrega."
-      },
-      SA: {
+      },      SA: {
         intro: "\u0627\u0644\u0633\u0644\u0627\u0645\u0020\u0639\u0644\u064a\u0643\u0645\u060c\u0020\u0623\u0631\u063a\u0628\u0020\u0641\u064a\u0020\u0637\u0644\u0628\u0020\u0647\u0630\u0627\u0020\u0627\u0644\u0645\u0646\u062a\u062c\u0020\u0645\u0646\u0020\u0041\u004e\u0041\u004d\u005a\u0049\u003a",
         product: "\u0627\u0644\u0645\u0646\u062a\u062c",
         price: "\u0627\u0644\u0633\u0639\u0631",
@@ -221,7 +219,7 @@ export default function Home() {
         ending: "\u064a\u0631\u062c\u0649\u0020\u062a\u0623\u0643\u064a\u062f\u0020\u062a\u0648\u0641\u0631\u0020\u0627\u0644\u0645\u0646\u062a\u062c\u0020\u0648\u062a\u0641\u0627\u0635\u064a\u0644\u0020\u0627\u0644\u062a\u0648\u0635\u064a\u0644\u002e"
       },
       DE: {
-        intro: "Hallo! Ich mÃƒÂ¶chte dieses Produkt bei ANAMZI bestellen:",
+        intro: "Hallo! Ich m\u00F6chte dieses Produkt bei ANAMZI bestellen:",
         product: "Produkt",
         price: "Preis",
         quantity: "Menge",
@@ -229,31 +227,28 @@ export default function Home() {
         phone: "Telefon",
         city: "Stadt",
         address: "Adresse",
-        ending: "Bitte bestÃƒÂ¤tigen Sie die VerfÃƒÂ¼gbarkeit und die Lieferdetails."
-      },
-      IT: {
+        ending: "Bitte best\u00E4tigen Sie die Verf\u00FCgbarkeit und die Lieferdetails."
+      },      IT: {
         intro: "Ciao! Vorrei ordinare questo prodotto da ANAMZI:",
         product: "Prodotto",
         price: "Prezzo",
-        quantity: "QuantitÃƒÂ ",
+        quantity: "Quantit\u00E0",
         name: "Nome",
         phone: "Telefono",
-        city: "CittÃƒÂ ",
+        city: "Citt\u00E0",
         address: "Indirizzo",
-        ending: "Conferma la disponibilitÃƒÂ  e i dettagli della consegna, per favore."
-      },
-      PT: {
-        intro: "OlÃƒÂ¡! Gostaria de encomendar este produto da ANAMZI:",
+        ending: "Conferma la disponibilit\u00E0 e i dettagli della consegna, per favore."
+      },      PT: {
+        intro: "Ol\u00E1! Gostaria de encomendar este produto da ANAMZI:",
         product: "Produto",
-        price: "PreÃƒÂ§o",
+        price: "Pre\u00E7o",
         quantity: "Quantidade",
         name: "Nome",
         phone: "Telefone",
         city: "Cidade",
         address: "Morada",
         ending: "Por favor, confirme a disponibilidade e os detalhes da entrega."
-      },
-      NL: {
+      },      NL: {
         intro: "Hallo! Ik wil dit product bestellen bij ANAMZI:",
         product: "Product",
         price: "Prijs",
@@ -265,48 +260,47 @@ export default function Home() {
         ending: "Bevestig alstublieft de beschikbaarheid en bezorggegevens."
       },
       TR: {
-        intro: "Merhaba! ANAMZI ÃƒÂ¼zerinden bu ÃƒÂ¼rÃƒÂ¼nÃƒÂ¼ sipariÃ…Å¸ etmek istiyorum:",
-        product: "ÃƒÅ“rÃƒÂ¼n",
+        intro: "Merhaba! ANAMZI \u00FCzerinden bu \u00FCr\u00FCn\u00FC sipari\u015F etmek istiyorum:",
+        product: "\u00DCr\u00FCn",
         price: "Fiyat",
         quantity: "Adet",
         name: "Ad",
         phone: "Telefon",
-        city: "Ã…Å¾ehir",
+        city: "\u015Eehir",
         address: "Adres",
-        ending: "LÃƒÂ¼tfen ÃƒÂ¼rÃƒÂ¼nÃƒÂ¼n mevcut olduÃ„Å¸unu ve teslimat ayrÃ„Â±ntÃ„Â±larÃ„Â±nÃ„Â± onaylayÃ„Â±n."
-      },
-      RU: {
-        intro: "Ãâ€”ÃÂ´Ã‘â‚¬ÃÂ°ÃÂ²Ã‘ÂÃ‘â€šÃÂ²Ã‘Æ’ÃÂ¹Ã‘â€šÃÂµ! ÃÂ¯ Ã‘â€¦ÃÂ¾Ã‘â€¡Ã‘Æ’ ÃÂ·ÃÂ°ÃÂºÃÂ°ÃÂ·ÃÂ°Ã‘â€šÃ‘Å’ Ã‘ÂÃ‘â€šÃÂ¾Ã‘â€š Ã‘â€šÃÂ¾ÃÂ²ÃÂ°Ã‘â‚¬ ÃÂ½ÃÂ° ANAMZI:",
-        product: "ÃÂ¢ÃÂ¾ÃÂ²ÃÂ°Ã‘â‚¬",
-        price: "ÃÂ¦ÃÂµÃÂ½ÃÂ°",
-        quantity: "ÃÅ¡ÃÂ¾ÃÂ»ÃÂ¸Ã‘â€¡ÃÂµÃ‘ÂÃ‘â€šÃÂ²ÃÂ¾",
-        name: "ÃËœÃÂ¼Ã‘Â",
-        phone: "ÃÂ¢ÃÂµÃÂ»ÃÂµÃ‘â€žÃÂ¾ÃÂ½",
-        city: "Ãâ€œÃÂ¾Ã‘â‚¬ÃÂ¾ÃÂ´",
-        address: "ÃÂÃÂ´Ã‘â‚¬ÃÂµÃ‘Â",
-        ending: "ÃÅ¸ÃÂ¾ÃÂ¶ÃÂ°ÃÂ»Ã‘Æ’ÃÂ¹Ã‘ÂÃ‘â€šÃÂ°, ÃÂ¿ÃÂ¾ÃÂ´Ã‘â€šÃÂ²ÃÂµÃ‘â‚¬ÃÂ´ÃÂ¸Ã‘â€šÃÂµ ÃÂ½ÃÂ°ÃÂ»ÃÂ¸Ã‘â€¡ÃÂ¸ÃÂµ Ã‘â€šÃÂ¾ÃÂ²ÃÂ°Ã‘â‚¬ÃÂ° ÃÂ¸ Ã‘Æ’Ã‘ÂÃÂ»ÃÂ¾ÃÂ²ÃÂ¸Ã‘Â ÃÂ´ÃÂ¾Ã‘ÂÃ‘â€šÃÂ°ÃÂ²ÃÂºÃÂ¸."
+        ending: "L\u00FCtfen \u00FCr\u00FCn\u00FCn mevcut oldu\u011Funu ve teslimat ayr\u0131nt\u0131lar\u0131n\u0131 onaylay\u0131n."
+      },      RU: {
+        intro: "\u041F\u0440\u0438\u0432\u0435\u0442! \u042F \u0445\u043E\u0447\u0443 \u0437\u0430\u043A\u0430\u0437\u0430\u0442\u044C \u044D\u0442\u043E\u0442 \u0442\u043E\u0432\u0430\u0440 \u043D\u0430 ANAMZI:",
+        product: "\u0422\u043E\u0432\u0430\u0440",
+        price: "\u0426\u0435\u043D\u0430",
+        quantity: "\u041A\u043E\u043B\u0438\u0447\u0435\u0441\u0442\u0432\u043E",
+        name: "\u0418\u043C\u044F",
+        phone: "\u0422\u0435\u043B\u0435\u0444\u043E\u043D",
+        city: "\u0413\u043E\u0440\u043E\u0434",
+        address: "\u0410\u0434\u0440\u0435\u0441",
+        ending: "\u041F\u043E\u0436\u0430\u043B\u0443\u0439\u0441\u0442\u0430, \u043F\u043E\u0434\u0442\u0432\u0435\u0440\u0434\u0438\u0442\u0435 \u043D\u0430\u043B\u0438\u0447\u0438\u0435 \u0442\u043E\u0432\u0430\u0440\u0430 \u0438 \u0443\u0441\u043B\u043E\u0432\u0438\u044F \u0434\u043E\u0441\u0442\u0430\u0432\u043A\u0438."
       },
       CN: {
-        intro: "Ã¦â€šÂ¨Ã¥Â¥Â½Ã¯Â¼ÂÃ¦Ë†â€˜Ã¦Æ’Â³Ã¥Å“Â¨ ANAMZI Ã¨Â®Â¢Ã¨Â´Â­Ã¦Â­Â¤Ã¥â€¢â€ Ã¥â€œÂÃ¯Â¼Å¡",
-        product: "Ã¥â€¢â€ Ã¥â€œÂ",
-        price: "Ã¤Â»Â·Ã¦Â Â¼",
-        quantity: "Ã¦â€¢Â°Ã©â€¡Â",
-        name: "Ã¥Â§â€œÃ¥ÂÂ",
-        phone: "Ã§â€ÂµÃ¨Â¯Â",
-        city: "Ã¥Å¸Å½Ã¥Â¸â€š",
-        address: "Ã¥Å“Â°Ã¥Ââ‚¬",
-        ending: "Ã¨Â¯Â·Ã§Â¡Â®Ã¨Â®Â¤Ã¥â€¢â€ Ã¥â€œÂÃ¦ËœÂ¯Ã¥ÂÂ¦Ã¦Å“â€°Ã¨Â´Â§Ã¤Â»Â¥Ã¥ÂÅ Ã©â€¦ÂÃ©â‚¬ÂÃ¨Â¯Â¦Ã¦Æ’â€¦Ã£â‚¬â€š"
+        intro: "\u4F60\u597D\uFF01\u6211\u60F3\u5728 ANAMZI \u8BA2\u8D2D\u8FD9\u4EF6\u5546\u54C1\uFF1A",
+        product: "\u5546\u54C1",
+        price: "\u4EF7\u683C",
+        quantity: "\u6570\u91CF",
+        name: "\u59D3\u540D",
+        phone: "\u7535\u8BDD",
+        city: "\u57CE\u5E02",
+        address: "\u5730\u5740",
+        ending: "\u8BF7\u786E\u8BA4\u5546\u54C1\u662F\u5426\u6709\u8D27\u4EE5\u53CA\u914D\u9001\u8BE6\u60C5\u3002"
       },
       JP: {
-        intro: "Ã£Ââ€œÃ£â€šâ€œÃ£ÂÂ«Ã£ÂÂ¡Ã£ÂÂ¯Ã£â‚¬â€šANAMZIÃ£ÂÂ§Ã£Ââ€œÃ£ÂÂ¡Ã£â€šâ€°Ã£ÂÂ®Ã¥â€¢â€ Ã¥â€œÂÃ£â€šâ€™Ã¦Â³Â¨Ã¦â€“â€¡Ã£Ââ€”Ã£ÂÅ¸Ã£Ââ€žÃ£ÂÂ§Ã£Ââ„¢Ã£â‚¬â€š",
-        product: "Ã¥â€¢â€ Ã¥â€œÂ",
-        price: "Ã¤Â¾Â¡Ã¦Â Â¼",
-        quantity: "Ã¦â€¢Â°Ã©â€¡Â",
-        name: "Ã¦Â°ÂÃ¥ÂÂ",
-        phone: "Ã©â€ºÂ»Ã¨Â©Â±Ã§â€¢ÂªÃ¥ÂÂ·",
-        city: "Ã¥Â¸â€šÃ¥Å’ÂºÃ§â€ÂºÃ¦Ââ€˜",
-        address: "Ã¤Â½ÂÃ¦â€°â‚¬",
-        ending: "Ã¥Å“Â¨Ã¥ÂºÂ«Ã§Å Â¶Ã¦Â³ÂÃ£ÂÂ¨Ã©â€¦ÂÃ©â‚¬ÂÃ£ÂÂ®Ã¨Â©Â³Ã§Â´Â°Ã£â€šâ€™Ã£Ââ€Ã§Â¢ÂºÃ¨ÂªÂÃ£ÂÂÃ£ÂÂ Ã£Ââ€¢Ã£Ââ€žÃ£â‚¬â€š"
+        intro: "\u3053\u3093\u306B\u3061\u306F\uFF01ANAMZI\u3067\u3053\u306E\u5546\u54C1\u3092\u6CE8\u6587\u3057\u305F\u3044\u3067\u3059\uFF1A",
+        product: "\u5546\u54C1",
+        price: "\u4FA1\u683C",
+        quantity: "\u6570\u91CF",
+        name: "\u6C0F\u540D",
+        phone: "\u96FB\u8A71\u756A\u53F7",
+        city: "\u5E02\u533A\u753A\u6751",
+        address: "\u4F4F\u6240",
+        ending: "\u5546\u54C1\u306E\u5728\u5EAB\u72B6\u6CC1\u3068\u914D\u9001\u306E\u8A73\u7D30\u3092\u3054\u78BA\u8A8D\u304F\u3060\u3055\u3044\u3002"
       },
       IN: {
         intro: "Hello! I'd like to order this product from ANAMZI:",
@@ -326,7 +320,7 @@ export default function Home() {
     const message = [
       language.intro,
       `${language.product}: ${selectedProduct.name}`,
-...(selectedProduct.video_url ? [`Product video / Lien de la vidÃ©o: ${selectedProduct.video_url}`] : []),
+...(selectedProduct.video_url ? [`Product video / Lien de la vid\u00E9o: ${selectedProduct.video_url}`] : []),
       ...(selectedProduct.colors.length && buyerColor ? [`Color: ${buyerColor}`] : []),
       ...(selectedProduct.sizes.length && buyerSize ? [`Size: ${buyerSize}`] : []),
       `${language.price}: ${selectedProduct.price}`,
@@ -503,7 +497,7 @@ export default function Home() {
                         />
                       ) : (
                         <div className="flex h-full items-center justify-center">
-                          <span className="text-6xl text-[#b7ff35]">Ã¢â€“Â¶</span>
+                          <span className="text-6xl text-[#b7ff35]">\u25B6</span>
                         </div>
                       )}
                       <span className="absolute bottom-3 left-3 rounded-full bg-black/80 px-3 py-1 text-xs font-semibold">
@@ -644,7 +638,7 @@ export default function Home() {
                   aria-label={t("close")}
                   className="rounded-full border border-white/10 px-3 py-2 hover:border-[#b7ff35]"
                 >
-                  Ã—
+                  \u00D7
                 </button>
               </div>
 
@@ -709,23 +703,23 @@ export default function Home() {
                     onChange={(e) => setBuyerCountry(e.target.value)}
                     className="w-full rounded-xl border border-white/10 bg-[#050706] px-4 py-3 outline-none focus:border-[#b7ff35]"
                   >
-                    <option value="MA">Morocco — العربية</option>
-                    <option value="FR">France â€” FranÃ§ais</option>
-                    <option value="GB">United Kingdom â€” English</option>
-                    <option value="US">United States â€” English</option>
-                    <option value="ES">Spain â€” EspaÃ±ol</option>
-                    <option value="SA">Saudi Arabia â€” Ø§Ù„Ø¹Ø±Ø¨ÙŠØ©</option>
-                    <option value="DE">Germany â€” Deutsch</option>
-                    <option value="IT">Italy â€” Italiano</option>
-                    <option value="PT">Portugal â€” PortuguÃªs</option>
-                    <option value="NL">Netherlands â€” Nederlands</option>
-                    <option value="TR">Turkey â€” TÃ¼rkÃ§e</option>
-                    <option value="RU">Russia â€” Ð ÑƒÑÑÐºÐ¸Ð¹</option>
-                    <option value="CN">China — 中文</option>
-                    <option value="JP">Japan — 日本語</option>
-                    <option value="IN">India â€” English</option>
-                    <option value="OTHER">Other country â€” English</option>
-                  </select>
+                    <option value="MA">{"Morocco \u2014 ???????"}</option>
+                    <option value="FR">{"France \u2014 Fran?ais"}</option>
+                    <option value="GB">{"United Kingdom \u2014 English"}</option>
+                    <option value="US">{"United States \u2014 English"}</option>
+                    <option value="ES">{"Spain \u2014 Espa?ol"}</option>
+                    <option value="SA">{"Saudi Arabia \u2014 ???????"}</option>
+                    <option value="DE">{"Germany \u2014 Deutsch"}</option>
+                    <option value="IT">{"Italy \u2014 Italiano"}</option>
+                    <option value="PT">{"Portugal \u2014 Portugu?s"}</option>
+                    <option value="NL">{"Netherlands \u2014 Nederlands"}</option>
+                    <option value="TR">{"Turkey \u2014 T?rk?e"}</option>
+                    <option value="RU">{"Russia \u2014 ???????"}</option>
+                    <option value="CN">{"China \u2014 ??"}</option>
+                    <option value="JP">{"Japan \u2014 ???"}</option>
+                    <option value="IN">{"India \u2014 English"}</option>
+                    <option value="OTHER">{"Other country \u2014 English"}</option>
+</select>
                 </div>
 
                 <div>
