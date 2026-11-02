@@ -231,6 +231,23 @@ export default function SellerPage() {
     }
   }
 
+  const colorLabels: Record<string, string> = {
+    Black: t("colorBlack"), White: t("colorWhite"), Grey: t("colorGrey"),
+    "Light Grey": t("colorLightGrey"), "Dark Grey": t("colorDarkGrey"),
+    Silver: t("colorSilver"), Red: t("colorRed"), Burgundy: t("colorBurgundy"),
+    Maroon: t("colorMaroon"), "Wine Red": t("colorWineRed"), Blue: t("colorBlue"),
+    "Navy Blue": t("colorNavyBlue"), "Sky Blue": t("colorSkyBlue"),
+    "Light Blue": t("colorLightBlue"), Green: t("colorGreen"),
+    "Dark Green": t("colorDarkGreen"), "Mint Green": t("colorMintGreen"),
+    "Olive Green": t("colorOliveGreen"), Pink: t("colorPink"), Purple: t("colorPurple"),
+    Lavender: t("colorLavender"), Lilac: t("colorLilac"), Magenta: t("colorMagenta"),
+    Beige: t("colorBeige"), Cream: t("colorCream"), Ivory: t("colorIvory"),
+    Brown: t("colorBrown"), Camel: t("colorCamel"), Khaki: t("colorKhaki"),
+    Yellow: t("colorYellow"), Mustard: t("colorMustard"), Gold: t("colorGold"),
+    Orange: t("colorOrange"), Coral: t("colorCoral"), Peach: t("colorPeach"),
+    Salmon: t("colorSalmon"), Turquoise: t("colorTurquoise"), Cyan: t("colorCyan"),
+    Teal: t("colorTeal"), Multicolor: t("colorMulticolor"),
+  };
   if (checking) {
     return (
       <main className="flex min-h-screen items-center justify-center bg-[#050706] text-[#b7ff35]">
@@ -243,19 +260,18 @@ export default function SellerPage() {
     <main className="min-h-screen bg-[#050706] px-4 py-10 text-[#e5e7eb] sm:px-6">
       <div className="mx-auto max-w-2xl">
         <Link href="/" className="text-sm text-[#b7ff35] hover:underline">
-          â† Back to ANAMZI
+          ← {t("backHome")} ANAMZI
         </Link>
 
         <header className="mb-8 mt-8">
           <p className="text-xs font-bold uppercase tracking-[0.3em] text-[#b7ff35]">
-            ANAMZI CREATOR STUDIO
+            {t("creatorStudio")}
           </p>
           <h1 className="mt-3 text-3xl font-black sm:text-4xl">
-            Sell your products.
+            {t("sellYourProducts")}
           </h1>
           <p className="mt-3 text-sm leading-6 text-neutral-400">
-            Upload a product video or image and share your offer with shoppers around the world.
-            Your product will be reviewed before it appears publicly.
+            {t("sellerIntro")}
           </p>
         </header>
 
@@ -265,7 +281,7 @@ export default function SellerPage() {
         >
           <div>
             <label htmlFor="product-title" className="mb-2 block text-sm font-semibold">
-              Product name
+              {t("productName")}
             </label>
             <input
               id="product-title"
@@ -280,7 +296,7 @@ export default function SellerPage() {
 
           <div>
             <label htmlFor="product-description" className="mb-2 block text-sm font-semibold">
-              Description
+              {t("description")}
             </label>
             <textarea
               id="product-description"
@@ -297,7 +313,7 @@ export default function SellerPage() {
           <div className="grid gap-4 sm:grid-cols-2">
             <div>
               <label htmlFor="product-price" className="mb-2 block text-sm font-semibold">
-                Price
+                {t("price")}
               </label>
               <input
                 id="product-price"
@@ -314,7 +330,7 @@ export default function SellerPage() {
 
             <div>
               <label htmlFor="product-currency" className="mb-2 block text-sm font-semibold">
-                Currency
+                {t("currency")}
               </label>
               <select
                 id="product-currency"
@@ -322,10 +338,10 @@ export default function SellerPage() {
                 onChange={(e) => setCurrency(e.target.value)}
                 className="w-full rounded-xl border border-white/10 bg-black px-4 py-3 outline-none focus:border-[#b7ff35]"
               >
-                <option value="USD">USD â€” US Dollar</option>
-                <option value="EUR">EUR â€” Euro</option>
-                <option value="MAD">MAD â€” Moroccan Dirham</option>
-                <option value="GBP">GBP â€” British Pound</option>
+                <option value="USD">USD — {t("usDollar")}</option>
+                <option value="EUR">EUR — {t("euro")}</option>
+                <option value="MAD">MAD — {t("moroccanDirham")}</option>
+                <option value="GBP">GBP — {t("britishPound")}</option>
               </select>
             </div>
           </div>
@@ -387,7 +403,7 @@ export default function SellerPage() {
                     className="h-5 w-5 shrink-0 rounded-full border border-white/30"
                     style={{ background: option.color }}
                   />
-                  <span>{option.name}</span>
+                  <span>{colorLabels[option.name] ?? option.name}</span>
                   {colors.includes(option.name) && <span className="ml-auto text-[#b7ff35]">?</span>}
                 </label>
               ))}
@@ -429,14 +445,14 @@ export default function SellerPage() {
               <option value="affiliate">{t("affiliate")}</option>
             </select>
             <p className="mt-2 text-xs text-neutral-500">
-              Direct products send customers to your WhatsApp. Affiliate products send customers to your affiliate link.
+              {t("sellerDirectHelp")}
             </p>
           </div>
 
           {productType === "affiliate" && (
             <div>
               <label htmlFor="affiliate-url" className="mb-2 block text-sm font-semibold">
-                Affiliate purchase URL
+                {t("affiliatePurchaseUrl")}
               </label>
               <input
                 id="affiliate-url"
@@ -448,14 +464,14 @@ export default function SellerPage() {
                 className="w-full rounded-xl border border-white/10 bg-black px-4 py-3 outline-none focus:border-[#b7ff35]"
               />
               <p className="mt-2 text-xs text-neutral-500">
-                Use your valid affiliate tracking link. You must have permission to use the product video.
+                {t("affiliateTrackingHelp")}
               </p>
             </div>
           )}
 
           <div>
             <label htmlFor="seller-whatsapp" className="mb-2 block text-sm font-semibold">
-              WhatsApp number
+              {t("whatsappNumber")}
             </label>
             <input
               id="seller-whatsapp"
@@ -468,13 +484,13 @@ export default function SellerPage() {
               className="w-full rounded-xl border border-white/10 bg-black px-4 py-3 outline-none focus:border-[#b7ff35]"
             />
             <p className="mt-2 text-xs text-neutral-500">
-              Include your country code so customers can contact you internationally.
+              {t("whatsappHelp")}
             </p>
           </div>
 
           <div>
             <label htmlFor="product-media-type" className="mb-2 block text-sm font-semibold">
-              Product media type
+              {t("productMediaType")}
             </label>
             <select
               id="product-media-type"
@@ -494,7 +510,7 @@ export default function SellerPage() {
 
           <div>
             <label htmlFor="product-category" className="mb-2 block text-sm font-semibold">
-              Category
+              {t("category")}
             </label>
             <select
               id="product-category"
@@ -502,20 +518,20 @@ export default function SellerPage() {
               onChange={(e) => setCategory(e.target.value)}
               className="w-full rounded-xl border border-white/10 bg-black px-4 py-3 outline-none focus:border-[#b7ff35]"
             >
-              <option value="Gadgets">Gadgets</option>
-              <option value="Women">Women</option>
-              <option value="Men">Men</option>
-              <option value="Kids">Kids</option>
-              <option value="Shoes">Shoes</option>
-              <option value="Accessories">Accessories</option>
-              <option value="Other">Other</option>
+              <option value="Gadgets">{t("gadgets")}</option>
+              <option value="Women">{t("women")}</option>
+              <option value="Men">{t("men")}</option>
+              <option value="Kids">{t("kids")}</option>
+              <option value="Shoes">{t("shoes")}</option>
+              <option value="Accessories">{t("accessories")}</option>
+              <option value="Other">{t("other")}</option>
             </select>
           </div>
 
           {mediaType === "video" ? (
             <div>
               <label htmlFor="product-video" className="mb-2 block text-sm font-semibold">
-                Product video
+                {t("productVideo")}
               </label>
               <input
                 id="product-video"
@@ -530,7 +546,7 @@ export default function SellerPage() {
           ) : (
             <div>
               <label htmlFor="product-image" className="mb-2 block text-sm font-semibold">
-                Product image
+                {t("productImage")}
               </label>
               <input
                 id="product-image"
@@ -554,7 +570,7 @@ export default function SellerPage() {
             </p>
           )}
 
-          {loading && message.startsWith("Uploading video") && (
+          {loading && uploadProgress > 0 && (
             <div className="space-y-2 rounded-xl border border-white/10 bg-black p-4">
               <div className="flex items-center justify-between text-sm">
                 <span className="text-neutral-300">{t("videoProgress")}</span>
@@ -583,13 +599,17 @@ export default function SellerPage() {
           </button>
 
           <p className="text-center text-xs leading-5 text-neutral-500">
-            Your product is published and available in the store.
+            {t("productAvailable")}
           </p>
         </form>
       </div>
     </main>
   );
 }
+
+
+
+
 
 
 

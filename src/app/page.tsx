@@ -451,7 +451,7 @@ export default function Home() {
         <div className="mt-7 flex flex-wrap gap-2">
           {["For you", "Gadgets", "Women", "Men", "Kids", "Shoes", "Accessories", "Other"].map((category) => (
             <button key={category} onClick={() => setActive(category)} className={`rounded-full px-4 py-2 text-sm font-semibold transition ${active === category ? "bg-[#d8dedb] text-[#080a09]" : "border border-white/10 bg-[#111513] hover:border-[#b7ff35]/70"}`}>
-              {category === "For you" ? t("forYou") : category === "Products" ? t("products") : category}
+              {category === "For you" ? t("forYou") : category === "Gadgets" ? t("gadgets") : category === "Women" ? t("women") : category === "Men" ? t("men") : category === "Kids" ? t("kids") : category === "Shoes" ? t("shoes") : category === "Accessories" ? t("accessories") : t("other")}
             </button>
           ))}
         </div>
@@ -574,7 +574,7 @@ export default function Home() {
         {!productsLoading && filtered.some((product) => Boolean(product.image_url) &&
           (active === "For you" || active === "Products" || product.category === active)) && (
           <div className="mt-12">
-            <p className="text-xs font-bold uppercase tracking-[0.2em] text-[#b7ff35]">Image products</p>
+            <p className="text-xs font-bold uppercase tracking-[0.2em] text-[#b7ff35]">{t("imageProducts")}</p>
             <div className="mt-5 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
               {filtered
                 .filter((product) => Boolean(product.image_url) &&
@@ -641,7 +641,7 @@ export default function Home() {
                 <button
                   type="button"
                   onClick={() => setSelectedProduct(null)}
-                  aria-label="Close order form"
+                  aria-label={t("close")}
                   className="rounded-full border border-white/10 px-3 py-2 hover:border-[#b7ff35]"
                 >
                   Ã—
@@ -653,7 +653,7 @@ export default function Home() {
                   <div>
                     <label htmlFor="buyer-color" className="mb-1.5 block text-sm font-medium">{t("chooseColor")}</label>
                     <select id="buyer-color" required value={buyerColor} onChange={(e) => setBuyerColor(e.target.value)} className="w-full rounded-xl border border-white/10 bg-[#050706] px-4 py-3 outline-none focus:border-[#b7ff35]">
-                      <option value="">Select a color</option>
+                      <option value="">{t("selectColor")}</option>
                       {selectedProduct.colors.map((option) => <option key={option} value={option}>{option}</option>)}
                     </select>
                   </div>
@@ -662,7 +662,7 @@ export default function Home() {
                   <div>
                     <label htmlFor="buyer-size" className="mb-1.5 block text-sm font-medium">{t("chooseSize")}</label>
                     <select id="buyer-size" required value={buyerSize} onChange={(e) => setBuyerSize(e.target.value)} className="w-full rounded-xl border border-white/10 bg-[#050706] px-4 py-3 outline-none focus:border-[#b7ff35]">
-                      <option value="">Select a size</option>
+                      <option value="">{t("selectSize")}</option>
                       {selectedProduct.sizes.map((option) => <option key={option} value={option}>{option}</option>)}
                     </select>
                   </div>
@@ -817,6 +817,7 @@ export default function Home() {
     </main>
   );
 }
+
 
 
 
