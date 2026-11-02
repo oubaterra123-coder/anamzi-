@@ -1,4 +1,4 @@
-﻿import type { Metadata } from "next";
+import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { LanguageProvider } from "@/components/language-provider";
 import "./globals.css";
@@ -16,6 +16,7 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "ANAMZI — Discover. Watch. Shop.",
   description: "Discover products, watch videos and shop directly with sellers on ANAMZI.",
+  icons: { icon: "/logo.png", shortcut: "/logo.png", apple: "/logo.png" },
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
