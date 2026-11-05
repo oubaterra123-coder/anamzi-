@@ -1,6 +1,7 @@
-﻿import "server-only";
+import "server-only";
 import {
   createCipheriv,
+  createDecipheriv,
   createHmac,
   randomBytes,
   timingSafeEqual,
@@ -59,4 +60,25 @@ export function verifyMetaSignedRequest(value: string, secret: string) {
   } catch {
     return null;
   }
+}
+
+export function decryptThreadsToken(value: string): string {
+  const parts = value.split(".");
+  if (parts.length !== 4 || parts[0] !== "v1") {
+    throw new Error("Invalid encrypted Threads token");
+  }
+
+  const [, ivHex, tagHex, encryptedHex] = parts;
+  const decipher = createDecipheriv(
+    "aes-256-gcm",
+    getEncryptionKey(),
+    Buffer.from(ivHex, "hex")
+  );
+
+  decipher.setAuthTag(Buffer.from(tagHex, "hex"));
+
+  return Buffer.concat([
+    decipher.update(Buffer.from(encryptedHex, "hex")),
+    decipher.final(),
+  ]).toString("utf8");
 }
