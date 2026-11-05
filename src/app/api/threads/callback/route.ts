@@ -1,4 +1,4 @@
-﻿import { NextRequest, NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { encryptThreadsToken } from "@/lib/threads/security";
@@ -87,16 +87,24 @@ export async function GET(request: NextRequest) {
     const longUrl = new URL("https://graph.threads.net/access_token");
     longUrl.searchParams.set("grant_type", "th_exchange_token");
     longUrl.searchParams.set("client_secret", appSecret);
+    longUrl.searchParams.set("access_token", shortToken.access_token);
 
     const longResponse = await fetch(longUrl, {
-      headers: { Authorization: `Bearer ${shortToken.access_token}` },
+      method: "GET",
       cache: "no-store",
     });
 
     const longToken = await longResponse.json();
 
     if (!longResponse.ok || !longToken.access_token) {
-      throw new Error("Threads long-lived token exchange failed");
+      const metaError =
+        longToken?.error?.message ??
+        longToken?.error_description ??
+        "Unknown Meta error";
+
+      throw new Error(
+        `Threads long-lived token exchange failed (${longResponse.status}): ${String(metaError).slice(0, 300)}`
+      );
     }
 
     const profileResponse = await fetch(
