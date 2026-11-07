@@ -268,9 +268,15 @@ export async function POST(request: Request) {
       publishedUrl,
     });
   } catch (error) {
-    const message = error instanceof Error ? error.message : "Unknown publishing error";
-    console.error("Threads publishing failed:", message);
+    const message =
+      error instanceof Error
+        ? error.message
+        : typeof error === "object" && error !== null
+          ? JSON.stringify(error)
+          : String(error);
+    console.error("Threads publishing failed:", error);
     await markFailed(supabase, id, attempts, message);
     return NextResponse.json({ success: false, error: message }, { status: 500 });
   }
 }
+
