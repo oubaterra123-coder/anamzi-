@@ -17,7 +17,7 @@ async function metaPost(url: string, values: Record<string, string>, token: stri
   });
   const data = await response.json();
   if (!response.ok || data.error) {
-    throw new Error(data.error?.message || "Threads API request failed");
+    throw new Error(JSON.stringify(data.error) || "Threads API request failed");
   }
   return data;
 }
@@ -187,7 +187,7 @@ export async function POST(request: Request) {
     const containerStatus = await statusResponse.json();
 
     if (!statusResponse.ok || containerStatus.error) {
-      throw new Error(containerStatus.error?.message || "Could not check media status");
+      throw new Error(JSON.stringify(containerStatus.error) || "Could not check media status");
     }
 
     if (containerStatus.status === "IN_PROGRESS") {
@@ -279,4 +279,5 @@ export async function POST(request: Request) {
     return NextResponse.json({ success: false, error: message }, { status: 500 });
   }
 }
+
 
