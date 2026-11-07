@@ -9,6 +9,7 @@ const GRAPH = "https://graph.threads.net/v1.0";
 
 async function metaPost(url: string, values: Record<string, string>, token: string) {
   const body = new URLSearchParams({ ...values, access_token: token });
+  console.log("THREADS META POST:", url);
   const response = await fetch(url, {
     method: "POST",
     headers: { "Content-Type": "application/x-www-form-urlencoded" },
@@ -180,6 +181,7 @@ export async function POST(request: Request) {
       });
     }
 
+    console.log("THREADS META STATUS:", containerId);
     const statusResponse = await fetch(
       `${GRAPH}/${containerId}?fields=status,error_message&access_token=${encodeURIComponent(token)}`,
       { cache: "no-store" }
