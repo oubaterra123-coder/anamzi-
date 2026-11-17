@@ -493,7 +493,7 @@ export default function Home() {
                           muted
                           controls
                           preload="metadata"
-                          className="h-full w-full object-cover"
+                          className="absolute inset-0 h-full w-full object-contain"
                         />
                       ) : (
                         <div className="flex h-full items-center justify-center">
