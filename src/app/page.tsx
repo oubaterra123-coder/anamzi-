@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { supabase } from "@/lib/supabase";
 import { useLanguage } from "@/components/language-provider";
+import BuyerAI from "@/components/buyer-ai";
 
 type Product = {
   id: string;
@@ -133,6 +134,30 @@ export default function Home() {
     setUserEmail(null);
   }
 
+  function handleBuyerAISelect(productId: string) {
+    const product = products.find((item) => item.id === productId);
+    if (!product) {
+      alert("This product is no longer available.");
+      return;
+    }
+
+    if (product.product_type === "affiliate") {
+      try {
+        const url = new URL(product.affiliate_url);
+        if (url.protocol !== "https:" && url.protocol !== "http:") {
+          throw new Error("Invalid URL protocol");
+        }
+        window.open(url.href, "_blank", "noopener,noreferrer");
+      } catch {
+        alert("This affiliate purchase link is invalid or unavailable.");
+      }
+      return;
+    }
+
+    setBuyerColor("");
+    setBuyerSize("");
+    setSelectedProduct(product);
+  }
   function handlePlatformShare(platform: "facebook" | "threads" | "instagram" | "youtube") {
     if (!shareProduct) return;
 
@@ -866,6 +891,7 @@ export default function Home() {
           <p>© 2026 ANAMZI</p>
         </div>
       </footer>
+          {!selectedProduct && !shareProduct && <BuyerAI onSelectProduct={handleBuyerAISelect} />}
           {shareProduct && (
         <div
           className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 p-4"
