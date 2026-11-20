@@ -43,6 +43,7 @@ export default function Home() {
   const [userEmail, setUserEmail] = useState<string | null>(null);
   const [authLoading, setAuthLoading] = useState(true);
   const [signingOut, setSigningOut] = useState(false);
+  const [shareProduct, setShareProduct] = useState<Product | null>(null);
 
   useEffect(() => {
     let mounted = true;
@@ -130,6 +131,49 @@ export default function Home() {
     }
 
     setUserEmail(null);
+  }
+
+  function handlePlatformShare(platform: "facebook" | "threads" | "instagram" | "youtube") {
+    if (!shareProduct) return;
+
+    const mediaUrl = shareProduct.video_url || shareProduct.image_url;
+    const caption = `${shareProduct.name} - ${shareProduct.price}\n${shareProduct.description}`.trim();
+    const shareText = `${caption}\n${mediaUrl}`;
+
+    if (platform === "facebook") {
+      window.open(
+        `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(mediaUrl)}&quote=${encodeURIComponent(caption)}`,
+        "_blank",
+        "noopener,noreferrer"
+      );
+    } else if (platform === "threads") {
+      window.open(
+        `https://www.threads.net/intent/post?text=${encodeURIComponent(shareText)}`,
+        "_blank",
+        "noopener,noreferrer"
+      );
+    } else {
+      if (platform === "youtube" && !shareProduct.video_url) {
+        alert("YouTube accepts videos. This product has no video.");
+        return;
+      }
+
+      if (navigator.clipboard?.writeText) {
+        navigator.clipboard.writeText(shareText).catch(() => {});
+      }
+
+      window.open(
+        platform === "instagram"
+          ? "https://www.instagram.com/"
+          : "https://www.youtube.com/upload",
+        "_blank",
+        "noopener,noreferrer"
+      );
+
+      alert("Caption copied. Select and upload your product media in the app.");
+    }
+
+    setShareProduct(null);
   }
 
   function handleWhatsAppOrder(event: React.FormEvent<HTMLFormElement>) {
@@ -503,6 +547,13 @@ export default function Home() {
                       <span className="absolute bottom-3 left-3 rounded-full bg-black/80 px-3 py-1 text-xs font-semibold">
                         ANAMZI product
                       </span>
+                      <button
+                        type="button"
+                        onClick={() => setShareProduct(product)}
+                        className="absolute right-3 top-3 rounded-full border border-[#b7ff35] bg-black/85 px-4 py-2 text-sm font-bold text-[#b7ff35] shadow-lg hover:bg-[#b7ff35] hover:text-black"
+                      >
+                        ↗ Partager
+                      </button>
                     </div>
 
                     <div className="p-5">
@@ -575,8 +626,15 @@ export default function Home() {
                   (active === "For you" || active === "Products" || product.category === active))
                 .map((product) => (
                   <article key={product.id} className="overflow-hidden rounded-3xl border border-white/10 bg-[#111513] transition hover:border-[#b7ff35]/40">
-                    <div className="aspect-[4/5] overflow-hidden bg-black">
+                    <div className="relative aspect-[4/5] overflow-hidden bg-black">
                       <img src={product.image_url} alt={product.name} loading="lazy" className="h-full w-full object-contain" />
+                      <button
+                        type="button"
+                        onClick={() => setShareProduct(product)}
+                        className="absolute right-3 top-3 rounded-full border border-[#b7ff35] bg-black/85 px-4 py-2 text-sm font-bold text-[#b7ff35] shadow-lg hover:bg-[#b7ff35] hover:text-black"
+                      >
+                        ↗ Partager
+                      </button>
                     </div>
                     <div className="p-5">
                       <p className="text-xs font-semibold uppercase tracking-wider text-[#b7ff35]">{product.category}</p>
@@ -808,7 +866,61 @@ export default function Home() {
           <p>© 2026 ANAMZI</p>
         </div>
       </footer>
-    </main>
+          {shareProduct && (
+        <div
+          className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 p-4"
+          onClick={() => setShareProduct(null)}
+        >
+          <div
+            role="dialog"
+            aria-modal="true"
+            aria-label="Share product"
+            onClick={(event) => event.stopPropagation()}
+            className="w-full max-w-sm rounded-3xl border border-white/10 bg-[#111513] p-6 shadow-2xl"
+          >
+            <div className="mb-5 flex items-center justify-between">
+              <div>
+                <p className="text-xs font-bold uppercase tracking-widest text-[#b7ff35]">ANAMZI</p>
+                <h2 className="mt-1 text-xl font-black">Partager le produit</h2>
+                <p className="mt-1 text-sm text-neutral-400">{shareProduct.name}</p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setShareProduct(null)}
+                aria-label="Close"
+                className="rounded-full bg-white/10 px-3 py-2 text-white hover:bg-white/20"
+              >
+                ✕
+              </button>
+            </div>
+
+            <div className="grid grid-cols-2 gap-3">
+              <button type="button" onClick={() => handlePlatformShare("facebook")}
+                className="rounded-2xl bg-[#1877F2] px-4 py-4 font-bold text-white hover:opacity-90">
+                Facebook
+              </button>
+              <button type="button" onClick={() => handlePlatformShare("threads")}
+                className="rounded-2xl bg-white px-4 py-4 font-bold text-black hover:bg-neutral-200">
+                Threads
+              </button>
+              <button type="button" onClick={() => handlePlatformShare("instagram")}
+                className="rounded-2xl bg-gradient-to-r from-purple-600 via-pink-600 to-orange-500 px-4 py-4 font-bold text-white hover:opacity-90">
+                Instagram
+              </button>
+              <button type="button" onClick={() => handlePlatformShare("youtube")}
+                className="rounded-2xl bg-[#FF0033] px-4 py-4 font-bold text-white hover:opacity-90">
+                YouTube
+              </button>
+            </div>
+
+            <p className="mt-5 text-xs leading-5 text-neutral-400">
+              Instagram et YouTube : ouvrez la plateforme et choisissez le fichier média pour le publier.
+              YouTube nécessite une vidéo.
+            </p>
+          </div>
+        </div>
+      )}
+</main>
   );
 }
 
