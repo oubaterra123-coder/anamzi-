@@ -910,10 +910,39 @@ return (
                 {selectedProduct.colors.length > 0 && (
                   <div>
                     <label htmlFor="buyer-color" className="mb-1.5 block text-sm font-medium">{t("chooseColor")}</label>
-                    <select id="buyer-color" required value={buyerColor} onChange={(e) => setBuyerColor(e.target.value)} className="w-full rounded-xl border border-white/10 bg-[#050706] px-4 py-3 outline-none focus:border-[#b7ff35]">
-                      <option value="">{t("selectColor")}</option>
-                      {selectedProduct.colors.map((option) => <option key={option} value={option}>{option}</option>)}
-                    </select>
+                    <div className="flex flex-wrap gap-3">
+  {selectedProduct.colors.map((option) => {
+    const swatches: Record<string, string> = {
+      black: "#000000",
+      white: "#ffffff",
+      grey: "#808080",
+      red: "#ef4444",
+      blue: "#3b82f6",
+      "navy blue": "#172554",
+      green: "#22c55e",
+      pink: "#ec4899",
+      beige: "#d6c0a5",
+      cream: "#fff1cc",
+      brown: "#8b5e3c",
+      burgundy: "#800020",
+      yellow: "#facc15",
+      purple: "#a855f7",
+      orange: "#f97316"
+    };
+    return (
+      <button
+        key={option}
+        type="button"
+        title={option}
+        aria-label={`Choose ${option}`}
+        aria-pressed={buyerColor === option}
+        onClick={() => setBuyerColor(option)}
+        className={`h-10 w-10 rounded-full border-2 shadow-md transition ${buyerColor === option ? "border-[#b7ff35] ring-2 ring-[#b7ff35]/40" : "border-white/30"}`}
+        style={{ backgroundColor: swatches[option.trim().toLowerCase()] ?? "#9ca3af" }}
+      />
+    );
+  })}
+</div>
                   </div>
                 )}
                 {selectedProduct.sizes.length > 0 && (
