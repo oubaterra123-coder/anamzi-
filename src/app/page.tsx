@@ -29,6 +29,7 @@ type Product = {
 export default function Home() {
   const { language, setLanguage, t } = useLanguage();
   const [search, setSearch] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
   const [products, setProducts] = useState<Product[]>([]);
   const [productsLoading, setProductsLoading] = useState(true);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
@@ -451,12 +452,26 @@ export default function Home() {
     videos.forEach((video) => observer.observe(video));
 
     return () => observer.disconnect();
-  }, [products]);
+  }, [products, currentPage]);
   const filtered = products.filter((product) =>
     `${product.name} ${product.category}`.toLowerCase().includes(search.toLowerCase())
   );
 
-  return (
+    const categoryFiltered = filtered.filter((product) =>
+    Boolean(product.video_url || product.image_url) &&
+    (active === "For you" || active === "Products" || product.category === active)
+  );
+  const totalPages = Math.max(1, Math.ceil(categoryFiltered.length / 100));
+  const pageProducts = categoryFiltered.slice((currentPage - 1) * 100, currentPage * 100);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [search, active]);
+
+  useEffect(() => {
+    if (currentPage > totalPages) setCurrentPage(totalPages);
+  }, [currentPage, totalPages]);
+return (
     <main className="min-h-screen bg-[#050706] text-[#e5e7eb]">
       <header className="sticky top-0 z-20 border-b border-white/10 bg-[#050706]/95 backdrop-blur">
         <nav className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-5 py-4 lg:px-8">
@@ -523,34 +538,69 @@ export default function Home() {
           <p className="py-12 text-center text-neutral-400">{t("loadingProducts")}</p>
         ) : (
           <>
+        {!productsLoading && pageProducts.some((product) => Boolean(product.image_url) &&
+          (active === "For you" || active === "Products" || product.category === active)) && (
+          <div className="mt-12">
+            <p className="text-xs font-bold uppercase tracking-[0.2em] text-[#b7ff35]">{t("imageProducts")}</p>
+            <div className="mt-5 grid grid-cols-2 gap-3 sm:gap-5 lg:grid-cols-3 xl:grid-cols-4">
+              {pageProducts
+                .filter((product) => Boolean(product.image_url) &&
+                  (active === "For you" || active === "Products" || product.category === active))
+                .map((product) => (
+                  <article key={product.id} className="overflow-hidden rounded-2xl border border-white/10 bg-[#111513] transition hover:border-[#b7ff35]/40">
+                    <div className="relative aspect-[4/5] overflow-hidden bg-black">
+                      <img src={product.image_url} alt={product.name} loading="lazy" className="h-full w-full object-contain" />
+                      <button
+                        type="button"
+                        onClick={() => setShareProduct(product)}
+                        className="absolute right-3 top-3 rounded-full border border-[#b7ff35] bg-black/85 px-4 py-2 text-sm font-bold text-[#b7ff35] shadow-lg hover:bg-[#b7ff35] hover:text-black"
+                      >
+                        ↗ Partager
+                      </button>
+                    </div>
+                    <div className="p-5">
+                      <p className="text-xs font-semibold uppercase tracking-wider text-[#b7ff35]">{product.category}</p>
+                      <h3 className="mt-2 text-lg font-bold">{product.name}</h3>
+                      {product.description && <p className="mt-2 line-clamp-3 text-sm leading-6 text-neutral-400">{product.description}</p>}
+                      <div className="mt-5 flex items-center justify-between gap-3">
+                        <span className="font-black">{product.price}</span>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            if (product.product_type === "affiliate") {
+                              try {
+                                const url = new URL(product.affiliate_url);
+                                if (url.protocol !== "https:" && url.protocol !== "http:") throw new Error("Invalid URL protocol");
+                                window.open(url.href, "_blank", "noopener,noreferrer");
+                              } catch {
+                                alert("This affiliate purchase link is invalid or unavailable.");
+                              }
+                              return;
+                            }
+                            setBuyerColor("");
+                            setBuyerSize("");
+                            setSelectedProduct(product);
+                          }}
+                          className="rounded-full bg-[#b7ff35] px-4 py-2.5 text-sm font-bold text-[#080a09] transition hover:bg-[#9de51f]"
+                        >
+                          {product.product_type === "affiliate" ? `${t("buy")} ?` : t("order")}
+                        </button>
+                      </div>
+                    </div>
+                  </article>
+                ))}
+            </div>
+          </div>
+        )}
+
             <div className="relative mt-7">
-  
-              <div className="pointer-events-none absolute inset-0 z-20">
-                <button
-                  type="button"
-                  aria-label="Scroll products left"
-                  onClick={() => document.getElementById("products-feed-scroll")?.scrollBy({ left: -400, behavior: "smooth" })}
-                  className="pointer-events-auto absolute left-2 top-[38%] -translate-y-1/2 flex h-11 w-11 items-center justify-center rounded-full border-2 border-[#b7ff35] bg-[#050706]/90 text-3xl font-bold text-[#b7ff35] shadow-lg hover:bg-[#b7ff35] hover:text-black"
-                >&#x2039;</button>
-                <button
-                  type="button"
-                  aria-label="Scroll products right"
-                  onClick={() => document.getElementById("products-feed-scroll")?.scrollBy({ left: 400, behavior: "smooth" })}
-                  className="pointer-events-auto absolute right-2 top-[38%] -translate-y-1/2 flex h-11 w-11 items-center justify-center rounded-full border-2 border-[#b7ff35] bg-[#050706]/90 text-3xl font-bold text-[#b7ff35] shadow-lg hover:bg-[#b7ff35] hover:text-black"
-                >&#x203A;</button>
-              </div>
-<div id="products-feed-scroll" tabIndex={0} onKeyDown={(event) => {
-    if (event.key === "ArrowRight" || event.key === "ArrowLeft") {
-      event.preventDefault();
-      event.currentTarget.scrollBy({ left: event.key === "ArrowRight" ? 400 : -400, behavior: "smooth" });
-    }
-  }} className="flex snap-x snap-mandatory flex-row items-start gap-5 overflow-x-auto overflow-y-hidden scroll-smooth pb-4 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
-              {filtered
+<div id="products-feed-scroll" className="grid grid-cols-2 gap-4 sm:grid-cols-3 xl:grid-cols-4">
+              {pageProducts
                 .filter((product) => Boolean(product.video_url) && (active === "For you" || active === "Products" || product.category === active))
                 .map((product) => (
                   <article
                     key={product.id}
-                    className="group w-[86vw] max-w-md flex-none snap-start overflow-hidden rounded-3xl border border-white/10 bg-[#111513] transition hover:border-[#b7ff35]/40 sm:w-[360px]"
+                    className="group min-w-0 overflow-hidden rounded-3xl border border-white/10 bg-[#111513] transition hover:border-[#b7ff35]/40"
                   >
                     <div className="relative aspect-[9/16] overflow-hidden bg-black">
                       {product.video_url ? (
@@ -627,10 +677,7 @@ export default function Home() {
             </div>
 </div>
 
-            {filtered.filter(
-              (product) => (Boolean(product.video_url) || Boolean(product.image_url)) &&
-                (active === "For you" || active === "Products" || product.category === active)
-            ).length === 0 && (
+            {categoryFiltered.length === 0 && (
               <div className="my-8 rounded-3xl border border-white/10 bg-[#111513] px-6 py-14 text-center">
                 <p className="text-lg font-bold">{t("noProducts")}</p>
                 <p className="mt-2 text-sm text-neutral-400">
@@ -638,62 +685,18 @@ export default function Home() {
                 </p>
               </div>
             )}
+            {categoryFiltered.length > 0 && (
+              <div className="mt-10 flex flex-wrap items-center justify-center gap-2">
+                <button type="button" onClick={() => { setCurrentPage((page) => Math.max(1, page - 1)); document.getElementById("products")?.scrollIntoView({ behavior: "smooth" }); }} disabled={currentPage === 1} className="rounded-full border border-white/15 px-5 py-2.5 text-sm font-bold disabled:cursor-not-allowed disabled:opacity-30">
+                  Précédent
+                </button>
+                <span className="px-3 text-sm text-neutral-300">Page {currentPage} / {totalPages}</span>
+                <button type="button" onClick={() => { setCurrentPage((page) => Math.min(totalPages, page + 1)); document.getElementById("products")?.scrollIntoView({ behavior: "smooth" }); }} disabled={currentPage === totalPages} className="rounded-full bg-[#b7ff35] px-5 py-2.5 text-sm font-bold text-[#080a09] disabled:cursor-not-allowed disabled:opacity-30">
+                  Suivant
+                </button>
+              </div>
+            )}
           </>
-        )}
-
-        {!productsLoading && filtered.some((product) => Boolean(product.image_url) &&
-          (active === "For you" || active === "Products" || product.category === active)) && (
-          <div className="mt-12">
-            <p className="text-xs font-bold uppercase tracking-[0.2em] text-[#b7ff35]">{t("imageProducts")}</p>
-            <div className="mt-5 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-              {filtered
-                .filter((product) => Boolean(product.image_url) &&
-                  (active === "For you" || active === "Products" || product.category === active))
-                .map((product) => (
-                  <article key={product.id} className="overflow-hidden rounded-3xl border border-white/10 bg-[#111513] transition hover:border-[#b7ff35]/40">
-                    <div className="relative aspect-[4/5] overflow-hidden bg-black">
-                      <img src={product.image_url} alt={product.name} loading="lazy" className="h-full w-full object-contain" />
-                      <button
-                        type="button"
-                        onClick={() => setShareProduct(product)}
-                        className="absolute right-3 top-3 rounded-full border border-[#b7ff35] bg-black/85 px-4 py-2 text-sm font-bold text-[#b7ff35] shadow-lg hover:bg-[#b7ff35] hover:text-black"
-                      >
-                        ↗ Partager
-                      </button>
-                    </div>
-                    <div className="p-5">
-                      <p className="text-xs font-semibold uppercase tracking-wider text-[#b7ff35]">{product.category}</p>
-                      <h3 className="mt-2 text-lg font-bold">{product.name}</h3>
-                      {product.description && <p className="mt-2 line-clamp-3 text-sm leading-6 text-neutral-400">{product.description}</p>}
-                      <div className="mt-5 flex items-center justify-between gap-3">
-                        <span className="font-black">{product.price}</span>
-                        <button
-                          type="button"
-                          onClick={() => {
-                            if (product.product_type === "affiliate") {
-                              try {
-                                const url = new URL(product.affiliate_url);
-                                if (url.protocol !== "https:" && url.protocol !== "http:") throw new Error("Invalid URL protocol");
-                                window.open(url.href, "_blank", "noopener,noreferrer");
-                              } catch {
-                                alert("This affiliate purchase link is invalid or unavailable.");
-                              }
-                              return;
-                            }
-                            setBuyerColor("");
-                            setBuyerSize("");
-                            setSelectedProduct(product);
-                          }}
-                          className="rounded-full bg-[#b7ff35] px-4 py-2.5 text-sm font-bold text-[#080a09] transition hover:bg-[#9de51f]"
-                        >
-                          {product.product_type === "affiliate" ? `${t("buy")} ?` : t("order")}
-                        </button>
-                      </div>
-                    </div>
-                  </article>
-                ))}
-            </div>
-          </div>
         )}
 
         {selectedProduct && (
