@@ -809,10 +809,32 @@ return (
                   {viewProduct.colors?.length > 0 && (
                     <div className="mt-5">
                       <p className="mb-2 text-sm font-bold">Available colors</p>
-                      <div className="flex flex-wrap gap-2">
-                        {viewProduct.colors.map((color) => (
-                          <span key={color} className="rounded-full border border-white/15 px-3 py-2 text-sm">{color}</span>
-                        ))}
+                      <div className="flex flex-wrap gap-3">
+                        {viewProduct.colors.map((color) => {
+                          const swatches: Record<string, string> = {
+                            black: "#000000",
+                            white: "#ffffff",
+                            grey: "#808080",
+                            red: "#ef4444",
+                            blue: "#3b82f6",
+                            green: "#22c55e",
+                            pink: "#ec4899",
+                            beige: "#d6c0a5",
+                            brown: "#8b5e3c",
+                            yellow: "#facc15",
+                            purple: "#a855f7",
+                            orange: "#f97316"
+                          };
+                          return (
+                            <span
+                              key={color}
+                              title={color}
+                              aria-label={color}
+                              className="h-9 w-9 rounded-full border-2 border-white/30 shadow-md"
+                              style={{ backgroundColor: swatches[color.trim().toLowerCase()] ?? "#9ca3af" }}
+                            />
+                          );
+                        })}
                       </div>
                     </div>
                   )}
