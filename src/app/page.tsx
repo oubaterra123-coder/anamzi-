@@ -18,6 +18,7 @@ type Product = {
   description: string;
   video_url: string;
   image_url: string;
+  image_urls: string[];
   whatsapp_number: string;
   colors: string[];
   sizes: string[];
@@ -26,6 +27,34 @@ type Product = {
 };
 
 
+
+function ProductImageGallery({ images, alt }: { images: string[]; alt: string }) {
+  const [index, setIndex] = useState(0);
+  if (!images.length) return null;
+
+  return (
+    <div className="relative h-full w-full">
+      <img src={images[index]} alt={alt} loading="lazy" className="h-full w-full object-contain" />
+      {images.length > 1 && (
+        <>
+          <button type="button" aria-label="Previous image"
+            onClick={() => setIndex((current) => (current - 1 + images.length) % images.length)}
+            className="absolute left-2 top-1/2 -translate-y-1/2 rounded-full bg-black/75 px-3 py-2 text-xl text-white hover:bg-[#b7ff35] hover:text-black">
+            ‹
+          </button>
+          <button type="button" aria-label="Next image"
+            onClick={() => setIndex((current) => (current + 1) % images.length)}
+            className="absolute right-2 top-1/2 -translate-y-1/2 rounded-full bg-black/75 px-3 py-2 text-xl text-white hover:bg-[#b7ff35] hover:text-black">
+            ›
+          </button>
+          <span className="absolute bottom-3 left-1/2 -translate-x-1/2 rounded-full bg-black/75 px-3 py-1 text-xs font-bold text-white">
+            {index + 1}/{images.length}
+          </span>
+        </>
+      )}
+    </div>
+  );
+}
 export default function Home() {
   const { language, setLanguage, t } = useLanguage();
   const [search, setSearch] = useState("");
@@ -73,7 +102,7 @@ export default function Home() {
     let mounted = true;
 
     async function loadProducts() {
-      const { data, error } = await supabase.rpc("get_approved_products_with_affiliate");
+      const { data, error } = await supabase.rpc("get_approved_products_with_gallery");
 
       if (!mounted) return;
 
@@ -89,6 +118,7 @@ export default function Home() {
           currency: string | null;
           video_url: string | null;
           image_url: string | null;
+          image_urls: string[] | null;
           category: string | null;
           whatsapp_number: string | null;
           colors: string[] | null;
@@ -105,6 +135,7 @@ export default function Home() {
           description: item.description ?? "",
           video_url: item.video_url ? (item.video_url.startsWith("http") ? item.video_url : supabase.storage.from("products").getPublicUrl(item.video_url).data.publicUrl) : "",
           image_url: item.image_url ? (item.image_url.startsWith("http") ? item.image_url : supabase.storage.from("products").getPublicUrl(item.image_url).data.publicUrl) : "",
+          image_urls: (item.image_urls?.length ? item.image_urls : item.image_url ? [item.image_url] : []).map((url) => url.startsWith("http") ? url : supabase.storage.from("products").getPublicUrl(url).data.publicUrl),
           whatsapp_number: item.whatsapp_number ?? "",
           colors: item.colors ?? [],
           sizes: item.sizes ?? [],
@@ -538,18 +569,18 @@ return (
           <p className="py-12 text-center text-neutral-400">{t("loadingProducts")}</p>
         ) : (
           <>
-        {!productsLoading && pageProducts.some((product) => Boolean(product.image_url) &&
+        {!productsLoading && pageProducts.some((product) => Boolean(product.image_urls.length || product.image_url) &&
           (active === "For you" || active === "Products" || product.category === active)) && (
           <div className="mt-12">
             <p className="text-xs font-bold uppercase tracking-[0.2em] text-[#b7ff35]">{t("imageProducts")}</p>
             <div className="mt-5 grid grid-cols-2 gap-3 sm:gap-5 lg:grid-cols-3 xl:grid-cols-4">
               {pageProducts
-                .filter((product) => Boolean(product.image_url) &&
+                .filter((product) => Boolean(product.image_urls.length || product.image_url) &&
                   (active === "For you" || active === "Products" || product.category === active))
                 .map((product) => (
                   <article key={product.id} className="overflow-hidden rounded-2xl border border-white/10 bg-[#111513] transition hover:border-[#b7ff35]/40">
                     <div className="relative aspect-[4/5] overflow-hidden bg-black">
-                      <img src={product.image_url} alt={product.name} loading="lazy" className="h-full w-full object-contain" />
+                      <ProductImageGallery key={product.id} images={product.image_urls} alt={product.name} />
                       <button
                         type="button"
                         onClick={() => setShareProduct(product)}

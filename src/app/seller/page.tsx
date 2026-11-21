@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
@@ -22,7 +22,7 @@ export default function SellerPage() {
   const [colors, setColors] = useState<string[]>([]);
   const [sizes, setSizes] = useState<string[]>([]);
   const [video, setVideo] = useState<File | null>(null);
-  const [image, setImage] = useState<File | null>(null);
+  const [image, setImage] = useState<File[]>([]);
   const [mediaType, setMediaType] = useState<"video" | "image">("video");
   const [category, setCategory] = useState("Other");
   const [loading, setLoading] = useState(false);
@@ -58,10 +58,20 @@ export default function SellerPage() {
       return;
     }
 
-    const selectedMedia = mediaType === "video" ? video : image;
+    const selectedMedia = mediaType === "video" ? video : image[0] ?? null;
 
-    if (!selectedMedia) {
+    if (!selectedMedia || (mediaType === "image" && image.length === 0)) {
       setMessage(mediaType === "video" ? t("chooseVideo") : t("chooseImage"));
+      return;
+    }
+
+    if (mediaType === "image" && image.length > 10) {
+      setMessage("Choose a maximum of 10 images.");
+      return;
+    }
+
+    if (mediaType === "image" && image.some((file) => !file.type.startsWith("image/") || file.size > 50 * 1024 * 1024)) {
+      setMessage(t("validImage") + " / " + t("maxFileSize"));
       return;
     }
 
@@ -105,6 +115,7 @@ export default function SellerPage() {
     console.log("[ANAMZI] Submission started");
 
     let uploadedPath = "";
+    const uploadedPaths: string[] = [];
 
     try {
       console.log("[ANAMZI] Saving profile");
@@ -175,9 +186,61 @@ export default function SellerPage() {
       } catch (error) {
         const reason = error instanceof Error ? error.message : String(error);
         console.error("[ANAMZI] Resumable upload failed:", error);
+        if (uploadedPath) await supabase.storage.from("products").remove([uploadedPath]);
         setMessage(mediaType + " upload failed: " + reason);
         return;
       }
+      uploadedPaths.push(uploadedPath);
+
+      if (mediaType === "image") {
+        for (let i = 1; i < image.length; i++) {
+          const file = image[i];
+          const extension = file.name.split(".").pop()?.toLowerCase() || "jpg";
+          const path = `${userId}/${crypto.randomUUID()}.${extension}`;
+          uploadedPaths.push(path);
+
+          const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
+          if (sessionError) throw sessionError;
+
+          const accessToken = sessionData.session?.access_token;
+          const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+          const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
+          if (!accessToken || !supabaseUrl || !supabaseKey) {
+            throw new Error("Your session expired or Supabase configuration is missing. Sign in again.");
+          }
+
+          setMessage(t("uploading") + " " + t("image") + " " + (i + 1) + "/" + image.length);
+
+          await new Promise<void>((resolve, reject) => {
+            const upload = new tus.Upload(file, {
+              endpoint: supabaseUrl.replace(/\/$/, "") + "/storage/v1/upload/resumable",
+              retryDelays: [0, 3000, 5000, 10000, 20000],
+              headers: {
+                authorization: "Bearer " + accessToken,
+                apikey: supabaseKey,
+                "x-upsert": "false",
+              },
+              uploadDataDuringCreation: true,
+              removeFingerprintOnSuccess: true,
+              chunkSize: 6 * 1024 * 1024,
+              metadata: {
+                bucketName: "products",
+                objectName: path,
+                contentType: file.type || "image/jpeg",
+                cacheControl: "3600",
+              },
+              onError(error) { reject(error); },
+              onProgress(bytesUploaded, bytesTotal) {
+                const percent = bytesTotal > 0 ? Math.round(bytesUploaded * 100 / bytesTotal) : 0;
+                setUploadProgress(percent);
+              },
+              onSuccess() { resolve(); },
+            });
+            upload.start();
+          });
+        }
+      }
+
       console.log("[ANAMZI] Saving product");
       setMessage(t("savingProduct"));
       const { error: productError } = await supabase
@@ -192,6 +255,7 @@ export default function SellerPage() {
           sizes,
           video_url: mediaType === "video" ? uploadedPath : null,
           image_url: mediaType === "image" ? uploadedPath : null,
+          image_urls: mediaType === "image" ? uploadedPaths : [],
           category,
           product_type: productType,
           affiliate_url: productType === "affiliate" ? affiliateUrl.trim() : null,
@@ -199,7 +263,7 @@ export default function SellerPage() {
         });
 
       if (productError) {
-        await supabase.storage.from("products").remove([uploadedPath]);
+        await supabase.storage.from("products").remove(uploadedPaths.length ? uploadedPaths : [uploadedPath]);
         setMessage(`Product submission failed: ${productError.message}`);
         return;
       }
@@ -213,7 +277,7 @@ export default function SellerPage() {
       setColors([]);
       setSizes([]);
       setVideo(null);
-      setImage(null);
+      setImage([]);
       setMediaType("video");
       setCategory("Other");
 
@@ -222,7 +286,9 @@ export default function SellerPage() {
       const imageInput = document.getElementById("product-image") as HTMLInputElement | null;
       if (imageInput) imageInput.value = "";
     } catch {
-      if (uploadedPath) {
+      if (uploadedPaths.length > 0) {
+        await supabase.storage.from("products").remove(uploadedPaths);
+      } else if (uploadedPath) {
         await supabase.storage.from("products").remove([uploadedPath]);
       }
       setMessage(t("somethingWrong"));
@@ -499,7 +565,7 @@ export default function SellerPage() {
                 const nextType = e.target.value as "video" | "image";
                 setMediaType(nextType);
                 setVideo(null);
-                setImage(null);
+                setImage([]);
               }}
               className="w-full rounded-xl border border-white/10 bg-black px-4 py-3 outline-none focus:border-[#b7ff35]"
             >
@@ -553,7 +619,8 @@ export default function SellerPage() {
                 required
                 type="file"
                 accept="image/*"
-                onChange={(e) => setImage(e.target.files?.[0] ?? null)}
+                multiple
+                onChange={(e) => setImage(Array.from(e.target.files ?? []))}
                 className="block w-full rounded-xl border border-white/10 bg-black p-3 text-sm file:mr-4 file:rounded-lg file:border-0 file:bg-[#b7ff35] file:px-4 file:py-2 file:font-bold file:text-black"
               />
               <p className="mt-2 text-xs text-neutral-500">{t("maxFileSize")}</p>
