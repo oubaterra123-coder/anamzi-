@@ -26,7 +26,19 @@ type Product = {
   affiliate_url: string;
 };
 
-
+type OrderReceipt = {
+  product: Product;
+  images: string[];
+  buyerName: string;
+  buyerPhone: string;
+  buyerCountry: string;
+  buyerCity: string;
+  buyerAddress: string;
+  color: string;
+  size: string;
+  quantity: number;
+  totalPrice: string;
+};
 
 function ProductImageGallery({ images, alt }: { images: string[]; alt: string }) {
   const [index, setIndex] = useState(0);
@@ -75,6 +87,8 @@ export default function Home() {
   const [authLoading, setAuthLoading] = useState(true);
   const [signingOut, setSigningOut] = useState(false);
   const [shareProduct, setShareProduct] = useState<Product | null>(null);
+  const [orderReceipt, setOrderReceipt] = useState<OrderReceipt | null>(null);
+  const [viewProduct, setViewProduct] = useState<Product | null>(null);
 
   useEffect(() => {
     let mounted = true;
@@ -239,10 +253,6 @@ export default function Home() {
 
     const sellerPhone = selectedProduct.whatsapp_number.replace(/\D/g, "");
 
-    if (!sellerPhone) {
-      alert("This seller has not added a WhatsApp number yet.");
-      return;
-    }
 
     const languages: Record<string, {
       intro: string;
@@ -433,11 +443,37 @@ export default function Home() {
       language.ending
     ].join("\n");
 
-    window.open(
-      `https://wa.me/${sellerPhone}?text=${encodeURIComponent(message)}`,
-      "_blank",
-      "noopener,noreferrer"
-    );
+    const numericPrice = Number.parseFloat(selectedProduct.price.replace(",", "."));
+    const currency = selectedProduct.price.replace(/^[\d\s.,-]+/, "").trim();
+    const totalAmount = Number.isFinite(numericPrice) ? (numericPrice * quantity).toFixed(2) : "";
+    const receiptImages = selectedProduct.image_urls?.length
+      ? selectedProduct.image_urls
+      : selectedProduct.image_url
+        ? [selectedProduct.image_url]
+        : [];
+
+    setOrderReceipt({
+      product: { ...selectedProduct },
+      images: receiptImages,
+      buyerName: buyerName.trim(),
+      buyerPhone: buyerPhone.trim(),
+      buyerCountry,
+      buyerCity: buyerCity.trim(),
+      buyerAddress: buyerAddress.trim(),
+      color: buyerColor,
+      size: buyerSize,
+      quantity,
+      totalPrice: totalAmount ? `${totalAmount} ${currency}`.trim() : ""
+    });
+    if (sellerPhone) {
+      window.open(
+        `https://wa.me/${sellerPhone}?text=${encodeURIComponent(message)}`,
+        "_blank",
+        "noopener,noreferrer"
+      );
+    } else {
+      alert("This seller has not added a WhatsApp number yet. Your order details are shown below.");
+    }
 
     setSelectedProduct(null);
     setBuyerName("");
@@ -579,11 +615,11 @@ return (
                   (active === "For you" || active === "Products" || product.category === active))
                 .map((product) => (
                   <article key={product.id} className="overflow-hidden rounded-2xl border border-white/10 bg-[#111513] transition hover:border-[#b7ff35]/40">
-                    <div className="relative aspect-[4/5] overflow-hidden bg-black">
+                    <div className="relative aspect-[4/5] cursor-pointer overflow-hidden bg-black" onClick={() => setViewProduct(product)}>
                       <ProductImageGallery key={product.id} images={product.image_urls} alt={product.name} />
                       <button
                         type="button"
-                        onClick={() => setShareProduct(product)}
+                        onClick={(event) => { event.stopPropagation(); setShareProduct(product); }}
                         className="absolute right-3 top-3 rounded-full border border-[#b7ff35] bg-black/85 px-4 py-2 text-sm font-bold text-[#b7ff35] shadow-lg hover:bg-[#b7ff35] hover:text-black"
                       >
                         ↗ Partager
@@ -591,7 +627,7 @@ return (
                     </div>
                     <div className="p-5">
                       <p className="text-xs font-semibold uppercase tracking-wider text-[#b7ff35]">{product.category}</p>
-                      <h3 className="mt-2 text-lg font-bold">{product.name}</h3>
+                      <h3 onClick={() => setViewProduct(product)} className="mt-2 cursor-pointer text-lg font-bold hover:text-[#b7ff35]">{product.name}</h3>
                       {product.description && <p className="mt-2 line-clamp-3 text-sm leading-6 text-neutral-400">{product.description}</p>}
                       <div className="mt-5 flex items-center justify-between gap-3">
                         <span className="font-black">{product.price}</span>
@@ -655,7 +691,7 @@ return (
                       </span>
                       <button
                         type="button"
-                        onClick={() => setShareProduct(product)}
+                        onClick={(event) => { event.stopPropagation(); setShareProduct(product); }}
                         className="absolute right-3 top-3 rounded-full border border-[#b7ff35] bg-black/85 px-4 py-2 text-sm font-bold text-[#b7ff35] shadow-lg hover:bg-[#b7ff35] hover:text-black"
                       >
                         ↗ Partager
@@ -666,7 +702,7 @@ return (
                       <p className="text-xs font-semibold uppercase tracking-wider text-[#b7ff35]">
                         Product
                       </p>
-                      <h3 className="mt-2 text-lg font-bold">{product.name}</h3>
+                      <h3 onClick={() => setViewProduct(product)} className="mt-2 cursor-pointer text-lg font-bold hover:text-[#b7ff35]">{product.name}</h3>
 
                       {product.description && (
                         <p className="mt-2 line-clamp-3 text-sm leading-6 text-neutral-400">
@@ -728,6 +764,95 @@ return (
               </div>
             )}
           </>
+        )}
+
+        {viewProduct && (
+          <div className="fixed inset-0 z-[90] overflow-y-auto bg-[#050706] p-4 sm:p-8">
+            <div className="mx-auto max-w-5xl">
+              <button
+                type="button"
+                onClick={() => setViewProduct(null)}
+                className="mb-6 rounded-full border border-white/15 px-5 py-3 font-bold hover:border-[#b7ff35] hover:text-[#b7ff35]"
+              >
+                ← Retour
+              </button>
+
+              <div className="grid gap-8 rounded-3xl border border-white/10 bg-[#111513] p-5 sm:p-8 md:grid-cols-2">
+                <div className="min-w-0">
+                  {viewProduct.video_url && (
+                    <video
+                      src={viewProduct.video_url}
+                      controls
+                      playsInline
+                      className="mb-4 max-h-[65vh] w-full rounded-2xl bg-black object-contain"
+                    />
+                  )}
+                  {(viewProduct.image_urls?.length || viewProduct.image_url) && (
+                    <ProductImageGallery
+                      images={viewProduct.image_urls?.length ? viewProduct.image_urls : [viewProduct.image_url]}
+                      alt={viewProduct.name}
+                    />
+                  )}
+                </div>
+
+                <div className="flex flex-col">
+                  <p className="text-xs font-bold uppercase tracking-widest text-[#b7ff35]">
+                    {viewProduct.category}
+                  </p>
+                  <h2 className="mt-3 text-3xl font-black">{viewProduct.name}</h2>
+                  <p className="mt-4 text-2xl font-black text-[#b7ff35]">{viewProduct.price}</p>
+                  {viewProduct.description && (
+                    <p className="mt-5 whitespace-pre-wrap leading-7 text-neutral-300">
+                      {viewProduct.description}
+                    </p>
+                  )}
+                  {viewProduct.colors?.length > 0 && (
+                    <div className="mt-5">
+                      <p className="mb-2 text-sm font-bold">Available colors</p>
+                      <div className="flex flex-wrap gap-2">
+                        {viewProduct.colors.map((color) => (
+                          <span key={color} className="rounded-full border border-white/15 px-3 py-2 text-sm">{color}</span>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                  {viewProduct.sizes?.length > 0 && (
+                    <div className="mt-5">
+                      <p className="mb-2 text-sm font-bold">Available sizes</p>
+                      <div className="flex flex-wrap gap-2">
+                        {viewProduct.sizes.map((size) => (
+                          <span key={size} className="rounded-full border border-white/15 px-3 py-2 text-sm">{size}</span>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const product = viewProduct;
+                      setViewProduct(null);
+                      if (product.product_type === "affiliate") {
+                        try {
+                          const url = new URL(product.affiliate_url);
+                          if (url.protocol !== "https:" && url.protocol !== "http:") throw new Error("Invalid URL protocol");
+                          window.open(url.href, "_blank", "noopener,noreferrer");
+                        } catch {
+                          alert("This affiliate purchase link is invalid or unavailable.");
+                        }
+                        return;
+                      }
+                      setBuyerColor("");
+                      setBuyerSize("");
+                      setSelectedProduct(product);
+                    }}
+                    className="mt-8 w-full rounded-full bg-[#b7ff35] px-5 py-4 font-black text-[#080a09] hover:bg-[#9de51f]"
+                  >
+                    {viewProduct.product_type === "affiliate" ? t("buy") : t("order")}
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
         )}
 
         {selectedProduct && (
@@ -977,6 +1102,67 @@ return (
               Instagram et YouTube : ouvrez la plateforme et choisissez le fichier média pour le publier.
               YouTube nécessite une vidéo.
             </p>
+          </div>
+        </div>
+      )}
+      {orderReceipt && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 p-4">
+          <div className="max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-3xl border border-white/10 bg-[#111513] p-5 text-white shadow-2xl">
+            <div className="mb-5 flex items-center justify-between">
+              <div>
+                <p className="text-xs font-bold uppercase tracking-widest text-[#b7ff35]">ANAMZI</p>
+                <h2 className="mt-1 text-2xl font-black">Order confirmation</h2>
+                <p className="mt-1 text-sm text-neutral-400">Your order details</p>
+              </div>
+              <button type="button" onClick={() => setOrderReceipt(null)}
+                className="rounded-full bg-white/10 px-3 py-2 text-white hover:bg-white/20">
+                ✕
+              </button>
+            </div>
+
+            {orderReceipt.images.length > 0 && (
+              <div className="mb-4 grid grid-cols-2 gap-2">
+                {orderReceipt.images.slice(0, 4).map((src: string, index: number) => (
+                  <img key={index} src={src} alt={orderReceipt.product.name}
+                    className="h-36 w-full rounded-xl bg-black/30 object-contain" />
+                ))}
+              </div>
+            )}
+
+            <div className="rounded-2xl bg-white/5 p-4">
+              <h3 className="text-lg font-bold">{orderReceipt.product.name}</h3>
+              <p className="mt-1 text-sm text-neutral-400">{orderReceipt.product.category}</p>
+              {orderReceipt.product.description && (
+                <p className="mt-2 text-sm text-neutral-300">{orderReceipt.product.description}</p>
+              )}
+              <div className="mt-4 space-y-2 text-sm">
+                <div className="flex justify-between gap-3"><span className="text-neutral-400">Unit price</span><span>{orderReceipt.product.price}</span></div>
+                <div className="flex justify-between gap-3"><span className="text-neutral-400">Quantity</span><span>{orderReceipt.quantity}</span></div>
+                {orderReceipt.color && <div className="flex justify-between gap-3"><span className="text-neutral-400">Color</span><span>{orderReceipt.color}</span></div>}
+                {orderReceipt.size && <div className="flex justify-between gap-3"><span className="text-neutral-400">Size</span><span>{orderReceipt.size}</span></div>}
+                {orderReceipt.totalPrice && (
+                  <div className="mt-3 flex justify-between border-t border-white/10 pt-3 font-black">
+                    <span>Total</span><span className="text-[#b7ff35]">{orderReceipt.totalPrice}</span>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            <div className="mt-3 rounded-2xl bg-white/5 p-4">
+              <h3 className="mb-3 font-bold">Customer details</h3>
+              <div className="space-y-2 text-sm">
+                <p><span className="text-neutral-400">Name: </span>{orderReceipt.buyerName}</p>
+                <p><span className="text-neutral-400">Phone: </span>{orderReceipt.buyerPhone}</p>
+                <p><span className="text-neutral-400">Country: </span>{orderReceipt.buyerCountry}</p>
+                <p><span className="text-neutral-400">City: </span>{orderReceipt.buyerCity}</p>
+                <p><span className="text-neutral-400">Address: </span>{orderReceipt.buyerAddress}</p>
+              </div>
+            </div>
+
+            <button type="button" onClick={() => setOrderReceipt(null)}
+              className="mt-5 w-full rounded-full bg-[#b7ff35] px-5 py-3.5 font-bold text-black hover:bg-[#9de51f]">
+              Close
+            </button>
           </div>
         </div>
       )}
