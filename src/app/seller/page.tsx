@@ -28,6 +28,11 @@ export default function SellerPage() {
   const [loading, setLoading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
   const [message, setMessage] = useState("");
+  type SellerProduct = { id: string; title: string; video_url: string | null; image_url: string | null; image_urls: string[] | null; created_at: string };
+  const [myProducts, setMyProducts] = useState<SellerProduct[]>([]);
+  const [productsLoading, setProductsLoading] = useState(false);
+  const [deletingId, setDeletingId] = useState("");
+  const [productsMessage, setProductsMessage] = useState("");
 
   useEffect(() => {
     let active = true;
@@ -49,6 +54,76 @@ export default function SellerPage() {
     };
   }, [router]);
 
+  async function loadMyProducts() {
+    if (!userId) return;
+    setProductsLoading(true);
+    setProductsMessage("");
+
+    const { data, error } = await supabase
+      .from("products")
+      .select("id,title,video_url,image_url,image_urls,created_at")
+      .eq("seller_id", userId)
+      .order("created_at", { ascending: false });
+
+    if (error) {
+      setProductsMessage("Could not load your products: " + error.message);
+    } else {
+      setMyProducts((data || []) as SellerProduct[]);
+    }
+    setProductsLoading(false);
+  }
+
+  useEffect(() => {
+    if (userId) void loadMyProducts();
+  }, [userId]);
+
+  async function deleteMyProduct(product: SellerProduct) {
+    if (!userId || deletingId) return;
+    if (!window.confirm("Delete this product and its media permanently?")) return;
+
+    setDeletingId(product.id);
+    setProductsMessage("");
+
+    try {
+      const { data: deleted, error } = await supabase
+        .from("products")
+        .delete()
+        .eq("id", product.id)
+        .eq("seller_id", userId)
+        .select("id")
+        .maybeSingle();
+
+      if (error || !deleted) {
+        const reason = error?.message || "No product row returned. Check seller_id or Supabase DELETE policy.";
+        setProductsMessage(reason);
+        window.alert("ANAMZI delete error: " + reason);
+        return;
+      }
+
+      const paths = Array.from(new Set([
+        product.video_url,
+        product.image_url,
+        ...(Array.isArray(product.image_urls) ? product.image_urls : []),
+      ])).filter((item): item is string =>
+        typeof item === "string" && item.startsWith(userId + "/")
+      );
+
+      if (paths.length) {
+        const { error: storageError } = await supabase.storage.from("products").remove(paths);
+        setProductsMessage(storageError
+          ? "Product deleted, but some media files could not be removed: " + storageError.message
+          : "Product deleted successfully.");
+      } else {
+        setProductsMessage("Product deleted successfully.");
+      }
+
+      setMyProducts((current) => current.filter((item) => item.id !== product.id));
+    } catch (error) {
+      setProductsMessage("Delete failed: " + (error instanceof Error ? error.message : String(error)));
+    } finally {
+      setDeletingId("");
+    }
+  }
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setMessage("");
@@ -669,15 +744,63 @@ export default function SellerPage() {
             {t("productAvailable")}
           </p>
         </form>
+
+        <section className="mt-12 border-t border-white/10 pt-8">
+          <div className="mb-5 flex items-center justify-between gap-3">
+            <h2 className="text-xl font-black text-[#b7ff35]">My Products</h2>
+            <button type="button" onClick={() => void loadMyProducts()} disabled={productsLoading}
+              className="rounded-full border border-white/20 px-4 py-2 text-xs font-bold hover:border-[#b7ff35] disabled:opacity-50">
+              Refresh
+            </button>
+          </div>
+
+          {productsMessage && (
+            <p role="status" className="mb-4 rounded-xl border border-white/10 bg-black p-3 text-sm text-[#b7ff35]">
+              {productsMessage}
+            </p>
+          )}
+
+          {productsLoading ? (
+            <p className="text-sm text-neutral-400">Loading your products...</p>
+          ) : myProducts.length === 0 ? (
+            <p className="rounded-xl border border-white/10 bg-black p-5 text-sm text-neutral-400">
+              You have not added any products yet.
+            </p>
+          ) : (
+            <div className="space-y-4">
+              {myProducts.map((product) => {
+                const mediaPath = product.video_url || product.image_url || product.image_urls?.[0] || "";
+                const mediaUrl = mediaPath
+                  ? mediaPath.startsWith("http")
+                    ? mediaPath
+                    : supabase.storage.from("products").getPublicUrl(mediaPath).data.publicUrl
+                  : "";
+
+                return (
+                  <article key={product.id} className="flex gap-4 rounded-2xl border border-white/10 bg-black/60 p-3">
+                    {mediaUrl && (
+                      product.video_url ? (
+                        <video src={mediaUrl} controls playsInline className="h-24 w-24 shrink-0 rounded-xl bg-black object-cover" />
+                      ) : (
+                        <img src={mediaUrl} alt={product.title} className="h-24 w-24 shrink-0 rounded-xl bg-black object-cover" />
+                      )
+                    )}
+                    <div className="min-w-0 flex-1">
+                      <h3 className="break-words font-bold">{product.title}</h3>
+                      <p className="mt-1 text-xs text-neutral-500">{product.video_url ? "Video" : "Images"}</p>
+                      <button type="button" onClick={() => void deleteMyProduct(product)}
+                        disabled={deletingId === product.id || deletingId !== ""}
+                        className="mt-3 rounded-full border border-red-500/50 px-4 py-2 text-xs font-bold text-red-400 hover:bg-red-500/10 disabled:opacity-50">
+                        {deletingId === product.id ? "Deleting..." : "Delete product"}
+                      </button>
+                    </div>
+                  </article>
+                );
+              })}
+            </div>
+          )}
+        </section>
       </div>
     </main>
   );
 }
-
-
-
-
-
-
-
-
