@@ -21,6 +21,7 @@ export default function SellerPage() {
   const [affiliateUrl, setAffiliateUrl] = useState("");
   const [colors, setColors] = useState<string[]>([]);
   const [sizes, setSizes] = useState<string[]>([]);
+  const [availableAges, setAvailableAges] = useState<number[]>([]);
   const [video, setVideo] = useState<File | null>(null);
   const [image, setImage] = useState<File[]>([]);
   const [mediaType, setMediaType] = useState<"video" | "image">("video");
@@ -328,6 +329,7 @@ export default function SellerPage() {
           currency,
           colors,
           sizes,
+          available_ages: availableAges,
           video_url: mediaType === "video" ? uploadedPath : null,
           image_url: mediaType === "image" ? uploadedPath : null,
           image_urls: mediaType === "image" ? uploadedPaths : [],
@@ -351,6 +353,7 @@ export default function SellerPage() {
       setAffiliateUrl("");
       setColors([]);
       setSizes([]);
+      setAvailableAges([]);
       setVideo(null);
       setImage([]);
       setMediaType("video");
@@ -575,6 +578,21 @@ export default function SellerPage() {
             </div>
           </div>
 
+          <div>
+            <span className="mb-2 block text-sm font-semibold">Available ages (years)</span>
+            <div className="flex flex-wrap gap-2">
+              {Array.from({ length: 16 }, (_, i) => i + 1).map((age) => (
+                <label key={age} className="flex cursor-pointer items-center gap-2 rounded-full border border-white/10 px-3 py-2 text-sm">
+                  <input
+                    type="checkbox"
+                    checked={availableAges.includes(age)}
+                    onChange={(e) => setAvailableAges((current) => e.target.checked ? [...current, age] : current.filter((item) => item !== age))}
+                  />
+                  {age}
+                </label>
+              ))}
+            </div>
+          </div>
           <div>
             <span className="mb-2 block text-sm font-semibold">{t("productType")}</span>
             <select

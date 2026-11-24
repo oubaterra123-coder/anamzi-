@@ -22,6 +22,7 @@ type Product = {
   whatsapp_number: string;
   colors: string[];
   sizes: string[];
+  available_ages: number[];
   product_type: "direct" | "affiliate";
   affiliate_url: string;
 };
@@ -36,6 +37,7 @@ type OrderReceipt = {
   buyerAddress: string;
   color: string;
   size: string;
+  age: string;
   quantity: number;
   totalPrice: string;
 };
@@ -81,6 +83,7 @@ export default function Home() {
   const [buyerAddress, setBuyerAddress] = useState("");
   const [buyerColor, setBuyerColor] = useState("");
   const [buyerSize, setBuyerSize] = useState("");
+  const [buyerAge, setBuyerAge] = useState("");
   const [quantity, setQuantity] = useState(1);
   const [active, setActive] = useState("For you");
   const [userEmail, setUserEmail] = useState<string | null>(null);
@@ -137,6 +140,7 @@ export default function Home() {
           whatsapp_number: string | null;
           colors: string[] | null;
           sizes: string[] | null;
+          available_ages: number[] | null;
           product_type: string | null;
           affiliate_url: string | null;
         }) => ({
@@ -153,6 +157,7 @@ export default function Home() {
           whatsapp_number: item.whatsapp_number ?? "",
           colors: item.colors ?? [],
           sizes: item.sizes ?? [],
+          available_ages: item.available_ages ?? [],
           product_type: item.product_type === "affiliate" ? "affiliate" : "direct",
           affiliate_url: item.affiliate_url ?? "",
         })));
@@ -202,6 +207,7 @@ export default function Home() {
 
     setBuyerColor("");
     setBuyerSize("");
+    setBuyerAge("");
     setSelectedProduct(product);
   }
   function handlePlatformShare(platform: "facebook" | "threads" | "instagram" | "youtube") {
@@ -250,6 +256,7 @@ export default function Home() {
   function handleWhatsAppOrder(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (!selectedProduct) return;
+    if (selectedProduct.available_ages.length > 0 && (!buyerAge || !selectedProduct.available_ages.includes(Number(buyerAge)))) return;
 
     const sellerPhone = selectedProduct.whatsapp_number.replace(/\D/g, "");
 
@@ -434,6 +441,7 @@ export default function Home() {
 ...(selectedProduct.video_url ? [`Product video / Lien de la vid\u00E9o: ${selectedProduct.video_url}`] : []),
       ...(selectedProduct.colors.length && buyerColor ? [`Color: ${buyerColor}`] : []),
       ...(selectedProduct.sizes.length && buyerSize ? [`Size: ${buyerSize}`] : []),
+      ...(selectedProduct.available_ages.length && buyerAge ? [`Age: ${buyerAge} years`] : []),
       `${language.price}: ${selectedProduct.price}`,
       `${language.quantity}: ${quantity}`,
       `${language.name}: ${buyerName.trim()}`,
@@ -462,6 +470,7 @@ export default function Home() {
       buyerAddress: buyerAddress.trim(),
       color: buyerColor,
       size: buyerSize,
+      age: buyerAge,
       quantity,
       totalPrice: totalAmount ? `${totalAmount} ${currency}`.trim() : ""
     });
@@ -482,6 +491,7 @@ export default function Home() {
     setBuyerAddress("");
     setBuyerColor("");
     setBuyerSize("");
+    setBuyerAge("");
     setQuantity(1);
   }
   useEffect(() => {
@@ -646,6 +656,7 @@ return (
                             }
                             setBuyerColor("");
                             setBuyerSize("");
+    setBuyerAge("");
                             setSelectedProduct(product);
                           }}
                           className="rounded-full bg-[#b7ff35] px-4 py-2.5 text-sm font-bold text-[#080a09] transition hover:bg-[#9de51f]"
@@ -731,6 +742,7 @@ return (
 
                             setBuyerColor("");
                             setBuyerSize("");
+    setBuyerAge("");
                             setSelectedProduct(product);
                           }}
                           className="rounded-full bg-[#b7ff35] px-4 py-2.5 text-sm font-bold text-[#080a09] transition hover:bg-[#9de51f]"
@@ -865,6 +877,7 @@ return (
                       }
                       setBuyerColor("");
                       setBuyerSize("");
+    setBuyerAge("");
                       setSelectedProduct(product);
                     }}
                     className="mt-8 w-full rounded-full bg-[#b7ff35] px-5 py-4 font-black text-[#080a09] hover:bg-[#9de51f]"
@@ -951,6 +964,15 @@ return (
                     <select id="buyer-size" required value={buyerSize} onChange={(e) => setBuyerSize(e.target.value)} className="w-full rounded-xl border border-white/10 bg-[#050706] px-4 py-3 outline-none focus:border-[#b7ff35]">
                       <option value="">{t("selectSize")}</option>
                       {selectedProduct.sizes.map((option) => <option key={option} value={option}>{option}</option>)}
+                    </select>
+                  </div>
+                )}
+                {selectedProduct.available_ages.length > 0 && (
+                  <div>
+                    <label htmlFor="buyer-age" className="mb-1.5 block text-sm font-medium">Choose age</label>
+                    <select id="buyer-age" required value={buyerAge} onChange={(e) => setBuyerAge(e.target.value)} className="w-full rounded-xl border border-white/10 bg-[#050706] px-4 py-3 outline-none focus:border-[#b7ff35]">
+                      <option value="">Select age</option>
+                      {selectedProduct.available_ages.map((age) => <option key={age} value={String(age)}>{age} years</option>)}
                     </select>
                   </div>
                 )}
@@ -1191,6 +1213,7 @@ return (
                 <div className="flex justify-between gap-3"><span className="text-neutral-400">Quantity</span><span>{orderReceipt.quantity}</span></div>
                 {orderReceipt.color && <div className="flex justify-between gap-3"><span className="text-neutral-400">Color</span><span>{orderReceipt.color}</span></div>}
                 {orderReceipt.size && <div className="flex justify-between gap-3"><span className="text-neutral-400">Size</span><span>{orderReceipt.size}</span></div>}
+                {orderReceipt.age && <div className="flex justify-between gap-3"><span className="text-neutral-400">Age</span><span>{orderReceipt.age} years</span></div>}
                 {orderReceipt.totalPrice && (
                   <div className="mt-3 flex justify-between border-t border-white/10 pt-3 font-black">
                     <span>Total</span><span className="text-[#b7ff35]">{orderReceipt.totalPrice}</span>
