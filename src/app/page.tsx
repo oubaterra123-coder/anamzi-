@@ -536,7 +536,7 @@ export default function Home() {
 
     const categoryFiltered = filtered.filter((product) =>
     Boolean(product.video_url || product.image_url) &&
-    (active === "For you" || active === "Products" || product.category === active)
+    (active === "For you" || active === "Products" || (active === "Gadgets" ? ["Gadgets", "Other"].includes(product.category) : product.category === active))
   );
   const totalPages = Math.max(1, Math.ceil(categoryFiltered.length / 100));
   const pageProducts = categoryFiltered.slice((currentPage - 1) * 100, currentPage * 100);
@@ -604,7 +604,7 @@ return (
         </div>
 
         <div className="mt-7 flex flex-wrap gap-2">
-          {["For you", "Gadgets", "Women", "Men", "Kids", "Shoes", "Accessories", "Other"].map((category) => (
+          {["For you", "Women", "Men", "Kids", "Shoes", "Accessories", "Gadgets"].map((category) => (
             <button key={category} onClick={() => setActive(category)} className={`rounded-full px-4 py-2 text-sm font-semibold transition ${active === category ? "bg-[#d8dedb] text-[#080a09]" : "border border-white/10 bg-[#111513] hover:border-[#b7ff35]/70"}`}>
               {category === "For you" ? t("forYou") : category === "Gadgets" ? t("gadgets") : category === "Women" ? t("women") : category === "Men" ? t("men") : category === "Kids" ? t("kids") : category === "Shoes" ? t("shoes") : category === "Accessories" ? t("accessories") : t("other")}
             </button>
@@ -616,13 +616,13 @@ return (
         ) : (
           <>
         {!productsLoading && pageProducts.some((product) => Boolean(product.image_urls.length || product.image_url) &&
-          (active === "For you" || active === "Products" || product.category === active)) && (
+          (active === "For you" || active === "Products" || (active === "Gadgets" ? ["Gadgets", "Other"].includes(product.category) : product.category === active))) && (
           <div className="mt-12">
             <p className="text-xs font-bold uppercase tracking-[0.2em] text-[#b7ff35]">{t("imageProducts")}</p>
             <div className="mt-5 grid grid-cols-2 gap-3 sm:gap-5 lg:grid-cols-3 xl:grid-cols-4">
               {pageProducts
                 .filter((product) => Boolean(product.image_urls.length || product.image_url) &&
-                  (active === "For you" || active === "Products" || product.category === active))
+                  (active === "For you" || active === "Products" || (active === "Gadgets" ? ["Gadgets", "Other"].includes(product.category) : product.category === active)))
                 .map((product) => (
                   <article key={product.id} className="overflow-hidden rounded-2xl border border-white/10 bg-[#111513] transition hover:border-[#b7ff35]/40">
                     <div className="relative aspect-[4/5] cursor-pointer overflow-hidden bg-black" onClick={() => setViewProduct(product)}>
@@ -674,7 +674,7 @@ return (
             <div className="relative mt-7">
 <div id="products-feed-scroll" className="grid grid-cols-2 gap-4 sm:grid-cols-3 xl:grid-cols-4">
               {pageProducts
-                .filter((product) => Boolean(product.video_url) && (active === "For you" || active === "Products" || product.category === active))
+                .filter((product) => Boolean(product.video_url) && (active === "For you" || active === "Products" || (active === "Gadgets" ? ["Gadgets", "Other"].includes(product.category) : product.category === active)))
                 .map((product) => (
                   <article
                     key={product.id}
