@@ -214,18 +214,19 @@ export default function Home() {
     if (!shareProduct) return;
 
     const mediaUrl = shareProduct.video_url || shareProduct.image_url;
+    const productShareUrl = `${window.location.origin}/product/${encodeURIComponent(shareProduct.id)}`;
     const caption = `${shareProduct.name} - ${shareProduct.price}\n${shareProduct.description}`.trim();
     const shareText = `${caption}\n${mediaUrl}`;
 
     if (platform === "facebook") {
       window.open(
-        `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(mediaUrl)}&quote=${encodeURIComponent(caption)}`,
+        `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(productShareUrl)}&quote=${encodeURIComponent(caption)}`,
         "_blank",
         "noopener,noreferrer"
       );
     } else if (platform === "threads") {
       window.open(
-        `https://www.threads.net/intent/post?text=${encodeURIComponent(shareText)}`,
+        `https://www.threads.net/intent/post?text=${encodeURIComponent(`${caption}\n${productShareUrl}`)}`,
         "_blank",
         "noopener,noreferrer"
       );
